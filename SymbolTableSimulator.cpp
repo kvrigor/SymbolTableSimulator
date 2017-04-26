@@ -9,13 +9,12 @@
 #include <iostream>
 #include <fstream>
 #include <strings.h>
-#include <vector>
+#include <list>
 #include <conio.h>
 #include "search.h"
 #include "utils.h"
 #include "hash.h"
 
-using namespace BinarySearch;
 using std::cout;
 using std::cin;
 using std::endl;
@@ -57,25 +56,25 @@ Symbol::Symbol(const char* name_, const char* type_, const char* scope_)
 
 // -----------------------  prototypes -----------------------
 class Symbol;
-void CreateSortedList();
+void SortSymbolTable(std::list<Symbol> &);
 void CreateHashTable();
 void AddSymbolToList();
 void AddSymbolToHashTable();
 void SearchFromList();
 void SearchFromHashTable();
-void PrintSymbolTableRaw(std::vector<Symbol> &);
-void PrintSymbolTableSorted();
+void PrintSymbolTable(std::list<Symbol> &);
 void PrintHashTable();
 void _PrintBanner();
-bool _PreloadDataset(char *, std::vector<Symbol> &);
+bool _PreloadDataset(char *, std::list<Symbol> &);
 Symbol _ExtractSymbol(string);
-
+bool _CompareSymbols(const Symbol &,const Symbol &);
 // -------------------------------------------------------------
 // ------------------------    MAIN    -------------------------
 // -------------------------------------------------------------
 int main()
 {
-	std::vector<Symbol> symbolTableRaw;
+	std::list<Symbol> symbolTableRaw;
+
 	char * datasetFile = "symbol_table_mock1.csv";
 	if (!_PreloadDataset(datasetFile, symbolTableRaw))
 	{
@@ -84,6 +83,7 @@ int main()
 	}
 	else
 	{
+		std::list<Symbol> symbolTableCopy(symbolTableRaw);
 		char choice;
 		do
 		{
@@ -91,7 +91,7 @@ int main()
 			_PrintBanner();
 			cout<<"  [1] Create sorted list from dataset\n"
 				<<"  [2] Create hash table from dataset\n"
-				<<"  [3] Add new symbol to sorted list\n"
+				<<"  [3] Add new symbol to list\n"
 				<<"  [4] Add new symbol to hash table\n"
 				<<"  [5] Search symbol from sorted list using binary search\n"
 				<<"  [6] Search symbol from hash table\n"
@@ -102,7 +102,7 @@ int main()
 
 			switch(choice)
 			{
-			case '1': CreateSortedList(); break;
+			case '1': SortSymbolTable(symbolTableCopy); break;
 			case '2': CreateHashTable(); break;
 			case '3': AddSymbolToList(); break;
 			case '4': AddSymbolToHashTable(); break;
@@ -122,8 +122,8 @@ int main()
 					cin>>subChoice;
 					switch(subChoice)
 					{
-					case 'a': PrintSymbolTableRaw(symbolTableRaw); break;
-					case 'b': PrintSymbolTableSorted(); break;
+					case 'a': PrintSymbolTable(symbolTableRaw); break;
+					case 'b': PrintSymbolTable(symbolTableCopy); break;
 					case 'c': PrintHashTable(); break;
 					}
 				} while(subChoice != 'd');
@@ -135,12 +135,15 @@ int main()
 }
 
 // ----------------------- Main menu methods -----------------------
-void CreateSortedList()
+void SortSymbolTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
-	//TODO
-	cout<<"LoadDatasetToList -- work in progress...";
-	getch();
+	symbolTable.sort(_CompareSymbols);
+	cout<<"Sorting done. Display sorted symbol table? (y/n)";
+	char choice;
+	cin>>choice;
+	if (choice == 'y' || choice == 'Y')
+		PrintSymbolTable(symbolTable);
 }
 
 void CreateHashTable()
@@ -183,7 +186,7 @@ void SearchFromHashTable()
 	getch();
 }
 
-void PrintSymbolTableRaw(std::vector<Symbol> & symbolTable)
+void PrintSymbolTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
 	unsigned int symbolCount = symbolTable.size();
@@ -194,19 +197,9 @@ void PrintSymbolTableRaw(std::vector<Symbol> & symbolTable)
 
 		//TODO: align table columns properly
 		cout<<"Symbol Name"<<"\t"<<"Type"<<"\t"<<"Scope"<<endl<<endl;
-		for (unsigned int i = 0; i < symbolCount; i++)
-		{
-			cout<<symbolTable.at(i).ToString()<<endl;
-		}
+		for (std::list<Symbol>::iterator it=symbolTable.begin(); it != symbolTable.end(); ++it)
+			cout<<it->ToString()<<endl;
 	}
-	getch();
-}
-
-void PrintSymbolTableSorted()
-{
-	ClearScreen();
-	//TODO
-	cout<<"PrintSymbolTableSorted -- work in progress...";
 	getch();
 }
 
@@ -227,7 +220,7 @@ void _PrintBanner()
         <<" =========================="<<endl<<endl;
 }
 
-bool _PreloadDataset(char* fileName, std::vector<Symbol> &table)
+bool _PreloadDataset(char* fileName, std::list<Symbol> &table)
 {
 	std::ifstream myfile (fileName);
 	if (myfile.good())
@@ -257,4 +250,12 @@ Symbol _ExtractSymbol(string line)
 	newSymbol.Type = line.substr(comma1 + 1, comma2 - comma1 - 1);
 	newSymbol.Scope = line.substr(comma2 + 1);
 	return newSymbol;
+}
+
+bool _CompareSymbols(const Symbol &first, const Symbol &second)
+{
+	if (first.Name < second.Name)
+		return true;
+	else
+		return false;
 }
