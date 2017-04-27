@@ -1,7 +1,7 @@
 [Project]
 FileName=SymbolTableSimulator.dev
 Name=SymbolTableSimulator
-UnitCount=4
+UnitCount=5
 Type=1
 Ver=1
 ObjFiles=
@@ -86,4 +86,14 @@ OriginalFilename=
 ProductName=
 ProductVersion=
 AutoIncBuildNr=0
+
+[Unit5]
+FileName=structures.h
+CompileCpp=1
+Folder=SymbolTableSimulator
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
 
