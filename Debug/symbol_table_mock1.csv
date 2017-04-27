@@ -1,6 +1,6 @@
 # Sample data generated from https://mockaroo.com
 # Each line is formatted as: 
-# symbolName,Type,Scope
+# symbolName Type Scope
 maecenas652,function-integer,private
 leo174,function-boolean,public
 justo612,double,public
@@ -1001,3 +1001,4 @@ potenti667,class,private
 nulla831,integer,friend
 augue555,function-double,friend
 amet320,boolean,private
+
