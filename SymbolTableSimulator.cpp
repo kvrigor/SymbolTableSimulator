@@ -136,19 +136,28 @@ void AddSymbolToHashTable()
 
 void SearchFromList(std::list<Symbol> & symbolTable)
 {
-	ClearScreen();
-	//TODO
+	string symbolName;
 	Symbol result;
-	bool found = BinarySearch(symbolTable,"lorem", result);
-	if (found)
+	char choice;
+	do
 	{
-		cout<<"We found somethin'";
-	}
-	else
-	{
-		cout<<"We ain't found anythin'";
-	}
-	getch();
+		ClearScreen();
+		cout<<"Enter symbol name to search: ";
+		cin>>symbolName;
+		bool found = BinarySearch(symbolTable, symbolName, result);
+		if (found)
+		{
+			cout<<endl<<endl;
+			cout<<"\tSymbol name: "<<result.Name<<endl;
+			cout<<"\t       Type: "<<result.Type<<endl;
+			cout<<"\t      Scope: "<<result.Scope<<endl;
+		}
+		else
+			cout<<endl<<"Symbol '"<<symbolName<<"' not found.";
+
+		cout<<endl<<endl<<"Perform another search? (y/n) ";
+		cin>>choice;
+	} while (choice == 'y' || choice == 'Y');
 }
 
 void SearchFromHashTable()
@@ -199,19 +208,18 @@ bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 	std::ifstream myfile (fileName);
 	if (myfile.good())
 	{
-		for (string line; std::getline(myfile, line); )
-		{
-			if (line[0] != '#')
-			{
-				table.push_back(_ExtractSymbol(line));
-			}
-		}
+		string line;
+		std::getline(myfile, line); //ignore header
+//		for (line; std::getline(myfile, line); )
+//		{
+//			table.push_back(_ExtractSymbol(line));
+//		}
+		while(std::getline(myfile, line))
+			table.push_back(_ExtractSymbol(line));
 		return true;
 	}
 	else
-	{
 		return false;
-	}
 }
 
 Symbol _ExtractSymbol(string line)
