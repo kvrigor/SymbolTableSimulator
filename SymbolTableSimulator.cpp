@@ -21,7 +21,7 @@ using namespace SearchAlgorithms;
 
 // -----------------------  prototypes -----------------------
 void SortSymbolTable(std::list<Symbol> &);
-void CreateHashTable();
+void CreateHashTable(std::list<Symbol> &);
 void AddSymbolToList();
 void AddSymbolToHashTable();
 void SearchFromList(std::list<Symbol> &);
@@ -67,7 +67,7 @@ int main()
 			switch(choice)
 			{
 			case '1': SortSymbolTable(symbolTableCopy); break;
-			case '2': CreateHashTable(); break;
+			case '2': CreateHashTable(symbolTableCopy); break;
 			case '3': AddSymbolToList(); break;
 			case '4': AddSymbolToHashTable(); break;
 			case '5': SearchFromList(symbolTableCopy); break;
@@ -110,11 +110,12 @@ void SortSymbolTable(std::list<Symbol> & symbolTable)
 		PrintSymbolTable(symbolTable);
 }
 
-void CreateHashTable()
+void CreateHashTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
 	//TODO
 	cout<<"LoadDatasetToHashtable -- work in progress...";
+	Hash::HashTable symbolHashT(symbolTable);
 	getch();
 }
 
