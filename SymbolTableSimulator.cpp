@@ -21,8 +21,16 @@ using namespace SearchAlgorithms;
 
 // -----------------------  prototypes -----------------------
 void SortSymbolTable(std::list<Symbol> &);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> refs/remotes/origin/master
 void CreateHashTable(std::list<Symbol> &);
 void AddSymbolToList();
+=======
+void CreateHashTable();
+void AddSymbolToList(std::list<Symbol> &, std::list<Symbol> &);
+>>>>>>> origin/master
 void AddSymbolToHashTable();
 void SearchFromList(std::list<Symbol> &);
 void SearchFromHashTable();
@@ -67,8 +75,16 @@ int main()
 			switch(choice)
 			{
 			case '1': SortSymbolTable(symbolTableCopy); break;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> refs/remotes/origin/master
 			case '2': CreateHashTable(symbolTableCopy); break;
 			case '3': AddSymbolToList(); break;
+=======
+			case '2': CreateHashTable(); break;
+			case '3': AddSymbolToList(symbolTableRaw, symbolTableCopy); break;
+>>>>>>> origin/master
 			case '4': AddSymbolToHashTable(); break;
 			case '5': SearchFromList(symbolTableCopy); break;
 			case '6': SearchFromHashTable(); break;
@@ -114,17 +130,44 @@ void CreateHashTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
 	//TODO
+<<<<<<< HEAD
 	cout<<"LoadDatasetToHashtable -- work in progress...";
 	Hash::HashTable symbolHashT(symbolTable);
+<<<<<<< HEAD
+=======
+=======
+	cout<<"CreateHashTable -- work in progress...";
+>>>>>>> origin/master
+>>>>>>> refs/remotes/origin/master
 	getch();
 }
 
-void AddSymbolToList()
+void AddSymbolToList(std::list<Symbol> & rawSymbolTable, std::list<Symbol> & sortedSymbolTable)
 {
-	ClearScreen();
-	//TODO
-	cout<<"AddSymbolToList -- work in progress...";
-	getch();
+	Symbol newSymbol, searchResult;
+	char choice;
+	do
+	{
+		ClearScreen();
+		cout<<"Symbol name: ";
+		cin>>newSymbol.Name;
+		if(BinarySearch(sortedSymbolTable, newSymbol.Name, searchResult))
+			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' already exists.";
+		else
+		{
+			cout<<"       Type: ";
+			cin>>newSymbol.Type;
+			cout<<"      Scope: ";
+			cin>>newSymbol.Scope;
+			//stuff below is not so efficient.. we'll make things work for now
+			rawSymbolTable.push_back(newSymbol);
+			sortedSymbolTable.push_back(newSymbol);
+			sortedSymbolTable.sort(CompareSymbols);
+			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' successfully added to the list.";
+		}
+		cout<<endl<<endl<<"Try to add another symbol? (y/n) ";
+		cin>>choice;
+	} while (choice == 'y' || choice == 'Y');
 }
 
 void AddSymbolToHashTable()
@@ -211,10 +254,6 @@ bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 	{
 		string line;
 		std::getline(myfile, line); //ignore header
-//		for (line; std::getline(myfile, line); )
-//		{
-//			table.push_back(_ExtractSymbol(line));
-//		}
 		while(std::getline(myfile, line))
 			table.push_back(_ExtractSymbol(line));
 		return true;
