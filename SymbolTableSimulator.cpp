@@ -38,6 +38,7 @@ Symbol _ExtractSymbol(string);
 int main()
 {
 	std::list<Symbol> symbolTableRaw;
+	Hash::HashTable<Symbol> symbolHashT;
 
 	char * datasetFile = "symbol_table_mock1.csv";
 	if (!_PreloadDataset(datasetFile, symbolTableRaw))
@@ -114,9 +115,15 @@ void CreateHashTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
 	//TODO
-	cout<<"LoadDatasetToHashtable -- work in progress...";
-	Hash::HashTable symbolHashT(symbolTable);
 	cout<<"CreateHashTable -- work in progress...";
+	Hash::HashTable<Symbol> symbolHashT(symbolTable.size());
+	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
+	for(int i = 0; i < symbolTable.size(); i++)
+	{
+		cout<<"Inserting: "<<symbolVTbl[i].ToString()<<"\n";
+		symbolHashT.Insert(symbolVTbl[i]);
+		//getch();
+	}
 	getch();
 }
 

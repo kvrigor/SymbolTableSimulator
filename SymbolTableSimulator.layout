@@ -25,6 +25,10 @@ LeftChar=1
 [Editor_3]
 Open=0
 Top=0
+CursorCol=1
+CursorRow=65
+TopLine=42
+LeftChar=1
 [Editor_4]
 Open=0
 Top=0
