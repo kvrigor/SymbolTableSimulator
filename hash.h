@@ -10,7 +10,6 @@ using std::string;
 
 namespace Hash
 {
-	//using namespace CustomTypes;
 	
 	template <typename HashObj>
 	class HashTable
@@ -18,8 +17,12 @@ namespace Hash
 		public:
 			HashTable(int size = 100);
 			
+			void Set(int);
 			void MakeEmpty();
+			int Size();
 			bool Insert(const HashObj &);
+			HashObj Retrieve(const string, bool &);
+			std::list<HashObj> GetList();
 			
 		private:
 			enum EntryType { ACTIVE, EMPTY, DELETED };
@@ -32,19 +35,16 @@ namespace Hash
 				{
 					element = e;
 					info = i;
-				}
-				//HashValue(HashObj & e, EntryType i = EMPTY)
-				//	: element{ e }, info{ i } {}				
+				}			
 			};
 			
 			std::vector<HashValue> _symVector;
 			int _tblSize;
 			
 			unsigned int nextPrime(const int);
-			int hash(const HashObj &);
-			int hash2(const HashObj &, int);
-			
-			unsigned int HornersHash(const HashObj, int);
+			int hash(const string &);
+			int hash2(const string &, int);
+			unsigned int HornersHash(const string, int);
 			
 	};
 	
@@ -53,49 +53,65 @@ namespace Hash
 	{ MakeEmpty(); _tblSize = _symVector.size();}
 	
 	template <typename HashObj>
+	void HashTable<HashObj>::Set(int size)
+	{
+		_symVector.resize(nextPrime(size));
+		MakeEmpty();
+		_tblSize = _symVector.size();
+	}
+	
+	template <typename HashObj>
 	void HashTable<HashObj>::MakeEmpty()
 	{
-		_tblSize = 0;
-		//for(int i = 0; i < _symVector.size(); i++)
-		//_symVector[i]
+		for(int i = 0; i < _symVector.size(); i++)
+			_symVector[i].info = EMPTY;
+	}
+	
+	template <typename HashObj>
+	int HashTable<HashObj>::Size()
+	{
+		return _tblSize;
 	}
 	
 	template <typename HashObj>
 	bool HashTable<HashObj>::Insert(const HashObj & entry)
 	{
-		int index = hash(entry);
+		HashObj temp = entry;
+		int index = hash(temp.Name);
 		
 		_symVector[index].element = entry;
 		_symVector[index].info = ACTIVE;
 		
-		//rehash if need
+		//TODO: rehash if need
 		
 		
 		return true;
 	}
 	
 	template <typename HashObj>
-	int HashTable<HashObj>::hash(const HashObj & sym)
+	HashObj HashTable<HashObj>::Retrieve(const string key, bool & isFound)
 	{
-		HashObj temp = sym;
-		string strHash = temp.ToString();
+		int index = hash(key);
+		HashValue retObj = _symVector[index];
 		
-		int currentPos = HornersHash(temp, _tblSize);
-		int offset = hash2(temp, 23);
+		if (retObj.info != ACTIVE)
+			isFound = false;
+		else
+			isFound = true;
 		
-		cout<<"\ncurrentPos: "<<currentPos<<"\noffset: "<<offset<<"\n";
-		//getch();
-		
-		while(_symVector[currentPos].info != EMPTY && !CustomTypes::CompareSymbols(_symVector[currentPos].element, temp))
-		{
-			currentPos += offset;
-			if (currentPos >= _symVector.size())
-				currentPos -= _symVector.size();
-		}
-		cout<<"\nused position: "<<currentPos<<"\n";
-		
-		return currentPos;
-		
+		return retObj.element;
+	}
+	
+	template <typename HashObj>
+	std::list<HashObj> HashTable<HashObj>::GetList()
+	{
+		std::list<HashObj> tempList;
+		for(int i = 0; i < _symVector.size(); i++)
+			tempList.push_back(_symVector[i].element);
+		return tempList;
+	}
+	
+	
 		// hi(x) = (hash(x) + f(i)) mod Table_Size
 		// hi(x) is an index in the table to insert x
 		// hash(x) is the hash function
@@ -106,13 +122,31 @@ namespace Hash
 		// f(i) = i * hash2(x)
 		// hash2(x) = R - (x mod R)
 		// R: is prime, smaller than the table size
+	
+	template <typename HashObj>
+	int HashTable<HashObj>::hash(const string & sym)
+	{
+		string temp = sym;
+		string strHash = temp;
+		
+		int currentPos = HornersHash(temp, _tblSize);
+		int offset = hash2(temp, 23);
+		
+		while(_symVector[currentPos].info != EMPTY && _symVector[currentPos].element.Name != temp)
+		{
+			currentPos += offset;
+			if (currentPos >= _symVector.size())
+				currentPos -= _symVector.size();
+		}
+		
+		return currentPos;
 	}
 	
 	template <typename HashObj>
-	int HashTable<HashObj>::hash2(const HashObj & sym, int R)
+	int HashTable<HashObj>::hash2(const string & sym, int R)
 	{
 		unsigned int hashVal = 0;
-		string strName = sym.Name;
+		string strName = sym;
 		for(int i = 0; i < strName.size(); i++)
 			hashVal = 37 * hashVal + strName[i];
 			
@@ -120,22 +154,14 @@ namespace Hash
 	}
 	
 	template <typename HashObj>
-	unsigned int HashTable<HashObj>::HornersHash(const HashObj sym, int tableSize)
+	unsigned int HashTable<HashObj>::HornersHash(const string sym, int tableSize)
 	{
 		unsigned int hashVal = 0;
-		
-		string strName = sym.Name;
-		
-		cout<<"\n**HornersHash**\nstrName: "<<strName<<"\nlength: "<<strName.size()<<"\ntableSize: "<<tableSize;
-		//getch();
-		
+		string strName = sym;
 		for(int i = 0; i < strName.size(); i++)
 		{
-			hashVal = (37 * hashVal + strName[i]);// % tableSize;
-			cout<<"\ni="<<i<<"; hashVal="<<hashVal;
-			//getch();
+			hashVal = (37 * hashVal + strName[i]);
 		}
-		cout<<"\n";
 		
 		return hashVal % tableSize;
 	}
@@ -158,15 +184,8 @@ namespace Hash
 					foundPrime = false;
 			}
 		}
-		std::cout<<"\nnewprime is "<<newPrime<<"\n";
 		return newPrime;
 	}
 }
-
-namespace ColRes
-{
-	//TODO: collision resolution methods
-}
-
 
 #endif /* HASH_H_ */
