@@ -25,7 +25,7 @@ using namespace SearchAlgorithms;
 void SortSymbolTable(std::list<Symbol> &);
 void CreateHashTable(Hash::HashTable<Symbol> &, const std::list<Symbol> &);
 void AddSymbolToList(std::list<Symbol> &, std::list<Symbol> &);
-void AddSymbolToHashTable();
+void AddSymbolToHashTable(Hash::HashTable<Symbol> &);
 void SearchFromList(std::list<Symbol> &);
 void SearchFromHashTable(Hash::HashTable<Symbol> &);
 void PrintSymbolTable(std::list<Symbol> &);
@@ -73,7 +73,7 @@ int main()
 			case '1': SortSymbolTable(symbolTableCopy); break;
 			case '2': CreateHashTable(symbolHashT, symbolTableCopy); break;
 			case '3': AddSymbolToList(symbolTableRaw, symbolTableCopy); break;
-			case '4': AddSymbolToHashTable(); break;
+			case '4': AddSymbolToHashTable(symbolHashT); break;
 			case '5': SearchFromList(symbolTableCopy); break;
 			case '6': SearchFromHashTable(symbolHashT); break;
 			case '7':
@@ -118,7 +118,7 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 {
 	ClearScreen();
 	//TODO
-	cout<<"CreateHashTable -- work in progress...";
+	cout<<"CreateHashTable -- in progress...";
 	//cannot build with this code
 	//[Warning] extended initializer lists only available with -std=c++11 or -std=gnu++11
 	//symbolHashTable = new Hash::HashTable<Symbol>{symbolTable.size()};
@@ -129,7 +129,7 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 		symbolHashTable.Insert(symbolVTbl[i]);
 	}
 	
-	cout<<"\nsize: "<<symbolHashTable.Size()<<"\n";
+	cout<<"\nTotal symbols added: "<<symbolHashTable.Size()<<"\n";
 	getch();
 }
 
@@ -161,12 +161,32 @@ void AddSymbolToList(std::list<Symbol> & rawSymbolTable, std::list<Symbol> & sor
 	} while (choice == 'y' || choice == 'Y');
 }
 
-void AddSymbolToHashTable()
+void AddSymbolToHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 {
-	ClearScreen();
-	//TODO
-	cout<<"AddSymbolToHashtable -- work in progress...";
-	getch();
+	Symbol newSymbol, searchResult;
+	char choice;
+	bool alreadyExist;
+	do
+	{
+		ClearScreen();
+		cout<<"** Adding new Symbol to Hash Table **\n";
+		cout<<"Symbol name: ";
+		cin>>newSymbol.Name;
+		symbolHashTable.Retrieve(newSymbol.Name, alreadyExist);		
+		if(alreadyExist)
+			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' already exists.";
+		else
+		{
+			cout<<"       Type: ";
+			cin>>newSymbol.Type;
+			cout<<"      Scope: ";
+			cin>>newSymbol.Scope;
+			symbolHashTable.Insert(newSymbol);
+			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' successfully added to the Hash list.";
+		}
+		cout<<endl<<endl<<"Try to add another symbol? (y/n) ";
+		cin>>choice;
+	} while (choice == 'y' || choice == 'Y');
 }
 
 void SearchFromList(std::list<Symbol> & symbolTable)

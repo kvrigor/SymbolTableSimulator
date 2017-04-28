@@ -10,7 +10,6 @@ using std::string;
 
 namespace Hash
 {
-	//using namespace CustomTypes;
 	
 	template <typename HashObj>
 	class HashTable
@@ -36,9 +35,7 @@ namespace Hash
 				{
 					element = e;
 					info = i;
-				}
-				//HashValue(HashObj & e, EntryType i = EMPTY)
-				//	: element{ e }, info{ i } {}				
+				}			
 			};
 			
 			std::vector<HashValue> _symVector;
@@ -85,7 +82,7 @@ namespace Hash
 		_symVector[index].element = entry;
 		_symVector[index].info = ACTIVE;
 		
-		//rehash if need
+		//TODO: rehash if need
 		
 		
 		return true;
@@ -96,8 +93,7 @@ namespace Hash
 	{
 		int index = hash(key);
 		HashValue retObj = _symVector[index];
-		cout<<"\nAsked: "<<key<<";index: "<<index;
-		cout<<"\nRetrieved:\n"<<retObj.element.Name;
+		
 		if (retObj.info != ACTIVE)
 			isFound = false;
 		else
