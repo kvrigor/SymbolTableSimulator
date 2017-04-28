@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <conio.h>
+#include <stdio.h>
+#include <iomanip>
 #include "utils.h"
 #include "hash.h"
 
@@ -27,7 +29,7 @@ void AddSymbolToHashTable();
 void SearchFromList(std::list<Symbol> &);
 void SearchFromHashTable(Hash::HashTable<Symbol> &);
 void PrintSymbolTable(std::list<Symbol> &);
-void PrintHashTable();
+void PrintHashTable(Hash::HashTable<Symbol> &);
 void _PrintBanner();
 bool _PreloadDataset(char *, std::list<Symbol> &);
 Symbol _ExtractSymbol(string);
@@ -90,7 +92,7 @@ int main()
 					{
 					case 'a': PrintSymbolTable(symbolTableRaw); break;
 					case 'b': PrintSymbolTable(symbolTableCopy); break;
-					case 'c': PrintHashTable(); break;
+					case 'c': PrintHashTable(symbolHashT); break;
 					}
 				} while(subChoice != 'd');
 				break;
@@ -124,9 +126,7 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
 	for(int i = 0; i < symbolTable.size(); i++)
 	{
-		cout<<"Inserting: "<<symbolVTbl[i].ToString()<<"\n";
 		symbolHashTable.Insert(symbolVTbl[i]);
-		//getch();
 	}
 	
 	cout<<"\nsize: "<<symbolHashTable.Size()<<"\n";
@@ -234,18 +234,49 @@ void PrintSymbolTable(std::list<Symbol> & symbolTable)
 		SetConsoleBufferHeight(5 + symbolCount);
 
 		//TODO: align table columns properly
-		cout<<"Symbol Name"<<"\t"<<"Type"<<"\t"<<"Scope"<<endl<<endl;
+		cout<<endl
+			<<std::left<<std::setw(20)<<std::setfill(' ')<<"Symbol Name"
+			<<std::left<<std::setw(18)<<std::setfill(' ')<<"Type"
+			<<std::left<<std::setw(15)<<std::setfill(' ')<<"Scope"<<endl<<endl;
 		for (std::list<Symbol>::iterator it=symbolTable.begin(); it != symbolTable.end(); ++it)
-			cout<<it->ToString()<<"\n";
+		{
+			cout<<endl
+				<<std::left<<std::setw(20)<<std::setfill(' ')<<it->Name
+				<<std::left<<std::setw(18)<<std::setfill(' ')<<it->Type
+				<<std::left<<std::setw(15)<<std::setfill(' ')<<it->Scope;
+		}
 	}
 	getch();
 }
 
-void PrintHashTable()
+void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 {
 	ClearScreen();
-	//TODO
-	cout<<"PrintHashTable -- work in progress...";
+	unsigned int symbolCount = symbolHashTable.Size();
+	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
+	if (symbolCount > 0)
+	{
+		SetConsoleBufferHeight(5 + symbolCount);
+		std::list<Symbol> tempList = symbolHashTable.GetList();
+		int index = 0;
+
+		//TODO: align table columns properly
+		cout<<endl
+			<<std::left<<std::setw(7)<<std::setfill(' ')<<"index"
+			<<std::left<<std::setw(20)<<std::setfill(' ')<<"Symbol Name"
+			<<std::left<<std::setw(18)<<std::setfill(' ')<<"Type"
+			<<std::left<<std::setw(15)<<std::setfill(' ')<<"Scope"<<endl<<endl;
+		for (std::list<Symbol>::iterator it=tempList.begin(); it != tempList.end(); ++it)
+		{
+			cout<<endl
+				<<std::left<<std::setw(7)<<std::setfill(' ')<<index
+				<<std::left<<std::setw(20)<<std::setfill(' ')<<it->Name
+				<<std::left<<std::setw(18)<<std::setfill(' ')<<it->Type
+				<<std::left<<std::setw(15)<<std::setfill(' ')<<it->Scope;
+			index++;
+		}
+	}
+	cout<<endl;
 	getch();
 }
 
