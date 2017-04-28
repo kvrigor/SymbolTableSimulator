@@ -23,6 +23,7 @@ namespace Hash
 			bool Insert(const HashObj &);
 			HashObj Retrieve(const string, bool &);
 			std::list<HashObj> GetList();
+			int activeCount();
 			
 		private:
 			enum EntryType { ACTIVE, EMPTY, DELETED };
@@ -45,6 +46,7 @@ namespace Hash
 			int hash(const string &);
 			int hash2(const string &, int);
 			unsigned int HornersHash(const string, int);
+			void rehash();
 			
 	};
 	
@@ -82,8 +84,9 @@ namespace Hash
 		_symVector[index].element = entry;
 		_symVector[index].info = ACTIVE;
 		
-		//TODO: rehash if need
-		
+		//rehash if need
+		if (activeCount() + 1 >= _symVector.size())
+			rehash();
 		
 		return true;
 	}
@@ -185,6 +188,31 @@ namespace Hash
 			}
 		}
 		return newPrime;
+	}
+	
+	template <typename HashObj>
+	void HashTable<HashObj>::rehash()
+	{
+		std::vector<HashValue> oldArray = _symVector;
+		
+		_tblSize = nextPrime( 2 * oldArray.size());
+		_symVector.resize(_tblSize);
+		for(int i = 0; i < _tblSize; i++)
+			_symVector[i].info = EMPTY;
+		
+		for(int i = 0; i < oldArray.size(); i++)
+			if(oldArray[i].info == ACTIVE)
+				Insert(oldArray[i].element);
+	}
+	
+	template <typename HashObj>
+	int HashTable<HashObj>::activeCount()
+	{
+		int cnt = 0;
+		for(int i = 0; i < _symVector.size(); i++)
+			if(_symVector[i].info == ACTIVE)
+				cnt++;
+		return cnt;
 	}
 }
 
