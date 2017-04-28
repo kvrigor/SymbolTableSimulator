@@ -21,16 +21,8 @@ using namespace SearchAlgorithms;
 
 // -----------------------  prototypes -----------------------
 void SortSymbolTable(std::list<Symbol> &);
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> refs/remotes/origin/master
 void CreateHashTable(std::list<Symbol> &);
-void AddSymbolToList();
-=======
-void CreateHashTable();
 void AddSymbolToList(std::list<Symbol> &, std::list<Symbol> &);
->>>>>>> origin/master
 void AddSymbolToHashTable();
 void SearchFromList(std::list<Symbol> &);
 void SearchFromHashTable();
@@ -75,16 +67,8 @@ int main()
 			switch(choice)
 			{
 			case '1': SortSymbolTable(symbolTableCopy); break;
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> refs/remotes/origin/master
 			case '2': CreateHashTable(symbolTableCopy); break;
-			case '3': AddSymbolToList(); break;
-=======
-			case '2': CreateHashTable(); break;
 			case '3': AddSymbolToList(symbolTableRaw, symbolTableCopy); break;
->>>>>>> origin/master
 			case '4': AddSymbolToHashTable(); break;
 			case '5': SearchFromList(symbolTableCopy); break;
 			case '6': SearchFromHashTable(); break;
@@ -130,15 +114,9 @@ void CreateHashTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
 	//TODO
-<<<<<<< HEAD
 	cout<<"LoadDatasetToHashtable -- work in progress...";
 	Hash::HashTable symbolHashT(symbolTable);
-<<<<<<< HEAD
-=======
-=======
 	cout<<"CreateHashTable -- work in progress...";
->>>>>>> origin/master
->>>>>>> refs/remotes/origin/master
 	getch();
 }
 
