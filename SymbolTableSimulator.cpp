@@ -296,6 +296,7 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 			index++;
 		}
 	}
+	cout<<"\n\nTotal used slot: "<<symbolHashTable.activeCount()<<endl;
 	cout<<endl;
 	getch();
 }
