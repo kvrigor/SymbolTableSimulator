@@ -21,11 +21,11 @@ using namespace SearchAlgorithms;
 
 // -----------------------  prototypes -----------------------
 void SortSymbolTable(std::list<Symbol> &);
-void CreateHashTable(std::list<Symbol> &);
+void CreateHashTable(Hash::HashTable<Symbol> &, const std::list<Symbol> &);
 void AddSymbolToList(std::list<Symbol> &, std::list<Symbol> &);
 void AddSymbolToHashTable();
 void SearchFromList(std::list<Symbol> &);
-void SearchFromHashTable();
+void SearchFromHashTable(Hash::HashTable<Symbol> &);
 void PrintSymbolTable(std::list<Symbol> &);
 void PrintHashTable();
 void _PrintBanner();
@@ -62,17 +62,18 @@ int main()
 				<<"  [6] Search symbol from hash table\n"
 				<<"  [7] Print symbol table\n"
 				<<"  [8] Exit\n"
+				<<"\nsize: "<<symbolHashT.Size()<<"\n"
 				<<"  Enter your choice: ";
 			cin>>choice;
 
 			switch(choice)
 			{
 			case '1': SortSymbolTable(symbolTableCopy); break;
-			case '2': CreateHashTable(symbolTableCopy); break;
+			case '2': CreateHashTable(symbolHashT, symbolTableCopy); break;
 			case '3': AddSymbolToList(symbolTableRaw, symbolTableCopy); break;
 			case '4': AddSymbolToHashTable(); break;
 			case '5': SearchFromList(symbolTableCopy); break;
-			case '6': SearchFromHashTable(); break;
+			case '6': SearchFromHashTable(symbolHashT); break;
 			case '7':
 				char subChoice;
 				do
@@ -111,19 +112,24 @@ void SortSymbolTable(std::list<Symbol> & symbolTable)
 		PrintSymbolTable(symbolTable);
 }
 
-void CreateHashTable(std::list<Symbol> & symbolTable)
+void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
 	//TODO
 	cout<<"CreateHashTable -- work in progress...";
-	Hash::HashTable<Symbol> symbolHashT(symbolTable.size());
+	//cannot build with this code
+	//[Warning] extended initializer lists only available with -std=c++11 or -std=gnu++11
+	//symbolHashTable = new Hash::HashTable<Symbol>{symbolTable.size()};
+	symbolHashTable.Set(symbolTable.size());
 	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
 	for(int i = 0; i < symbolTable.size(); i++)
 	{
 		cout<<"Inserting: "<<symbolVTbl[i].ToString()<<"\n";
-		symbolHashT.Insert(symbolVTbl[i]);
+		symbolHashTable.Insert(symbolVTbl[i]);
 		//getch();
 	}
+	
+	cout<<"\nsize: "<<symbolHashTable.Size()<<"\n";
 	getch();
 }
 
@@ -189,13 +195,33 @@ void SearchFromList(std::list<Symbol> & symbolTable)
 	} while (choice == 'y' || choice == 'Y');
 }
 
-void SearchFromHashTable()
+void SearchFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 {
-	ClearScreen();
-	//TODO
+	string symbolName;
+	Symbol result;
+	char choice;
+	bool isFound;
+	do
+	{
+		ClearScreen();
+		cout<<"** SearchFromHashTable **\n";
+		cout<<"\nsize: "<<symbolHashTable.Size()<<"\n";
+		cout<<"Enter symbol name to search: ";
+		cin>>symbolName;
+		result = symbolHashTable.Retrieve(symbolName, isFound);
+		if (isFound)
+		{
+			cout<<endl<<endl;
+			cout<<"\tSymbol name: "<<result.Name<<endl;
+			cout<<"\t       Type: "<<result.Type<<endl;
+			cout<<"\t      Scope: "<<result.Scope<<endl;
+		}
+		else
+			cout<<endl<<"Symbol '"<<symbolName<<"' not found.";
 
-	cout<<"SearchFromHashtable -- work in progress...";
-	getch();
+		cout<<endl<<endl<<"Perform another search? (y/n) ";
+		cin>>choice;
+	} while (choice == 'y' || choice == 'Y');
 }
 
 void PrintSymbolTable(std::list<Symbol> & symbolTable)
