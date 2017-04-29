@@ -1,9 +1,9 @@
 //============================================================================
 // Name        : SymbolTableSimulator.cpp
-// Author      : chester.tan, paul.rigor
-// Version     : 0.1
-// Description : Simulates symbol table operations
-//				 using hashing and binary search.
+// Authors     : chester.tan, paul.rigor
+// Version     : v0.2 [Beta]
+// Description : Simulates symbol table operations using hashing and binary search.
+// Git repo    : https://github.com/kvrigor/SymbolTableSimulator
 //============================================================================
 
 #include <iostream>
@@ -116,11 +116,6 @@ void SortSymbolTable(std::list<Symbol> & symbolTable)
 void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
-	//TODO
-	cout<<"CreateHashTable -- in progress...";
-	//cannot build with this code
-	//[Warning] extended initializer lists only available with -std=c++11 or -std=gnu++11
-	//symbolHashTable = new Hash::HashTable<Symbol>{symbolTable.size()};
 	symbolHashTable.Set(symbolTable.size());
 	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
 	for(int i = 0; i < symbolTable.size(); i++)
@@ -252,7 +247,6 @@ void PrintSymbolTable(std::list<Symbol> & symbolTable)
 	{
 		SetConsoleBufferHeight(5 + symbolCount);
 
-		//TODO: align table columns properly
 		cout<<endl
 			<<std::left<<std::setw(20)<<std::setfill(' ')<<"Symbol Name"
 			<<std::left<<std::setw(18)<<std::setfill(' ')<<"Type"
@@ -279,7 +273,6 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 		std::list<Symbol> tempList = symbolHashTable.GetList();
 		int index = 0;
 
-		//TODO: align table columns properly
 		cout<<endl
 			<<std::left<<std::setw(7)<<std::setfill(' ')<<"index"
 			<<std::left<<std::setw(20)<<std::setfill(' ')<<"Symbol Name"
