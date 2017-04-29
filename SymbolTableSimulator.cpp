@@ -64,7 +64,6 @@ int main()
 				<<"  [6] Search symbol from hash table\n"
 				<<"  [7] Print symbol table\n"
 				<<"  [8] Exit\n"
-				<<"\nsize: "<<symbolHashT.Size()<<"\n"
 				<<"  Enter your choice: ";
 			cin>>choice;
 
