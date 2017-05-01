@@ -46,6 +46,7 @@ namespace Hash
 			size_t _tblSize;
 			int hash2_R;
 			int colCount;
+			int active;
 			
 			unsigned int nextPrime(const unsigned int);
 			size_t hash(const string &);
@@ -62,7 +63,6 @@ namespace Hash
 		_symVector = new HashValue[_tblSize];
 		MakeEmpty();
 		hash2_R = nextPrime(_tblSize / 10);
-		colCount = 0;
 	}
 	
 	template <typename HashObj>
@@ -72,12 +72,13 @@ namespace Hash
 		_symVector = new HashValue[_tblSize];
 		MakeEmpty();
 		hash2_R = nextPrime(_tblSize / 10);
-		colCount = 0;
 	}
 	
 	template <typename HashObj>
 	void HashTable<HashObj>::MakeEmpty()
 	{
+		colCount = 0;
+		active = 0;
 		for(size_t i = 0; i < _tblSize; i++)
 			_symVector[i].info = 0;
 	}
@@ -94,12 +95,16 @@ namespace Hash
 		HashObj temp = entry;
 		size_t index = hash(temp.Name);
 		
+		if (_symVector[index].info == 1)
+			return false;
+		
 		_symVector[index].element = entry;
 		_symVector[index].info = 1;
+		active++;
 		
 		//rehash if need
 		// TODO: rehashCount
-		if (activeCount() + 1 >= _tblSize)
+		if (active + 1 >= _tblSize)
 		{
 			rehash();
 			cout<<"\nrehash\n";
@@ -235,8 +240,7 @@ namespace Hash
 		_tblSize = nextPrime( 2 * oldSize);
 		_symVector = new HashValue[_tblSize];
 		
-		for(size_t i = 0; i < _tblSize; i++)
-			_symVector[i].info = 0;
+		MakeEmpty();
 		
 		for(size_t i = 0; i < oldSize; i++)
 			if(oldArray[i].info == 1)
@@ -246,11 +250,7 @@ namespace Hash
 	template <typename HashObj>
 	int HashTable<HashObj>::activeCount()
 	{
-		int cnt = 0;
-		for(int i = 0; i < _tblSize; i++)
-			if(_symVector[i].info == 1)
-				cnt++;
-		return cnt;
+		return active;
 	}
 }
 
