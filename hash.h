@@ -15,58 +15,71 @@ namespace Hash
 	class HashTable
 	{
 		public:
-			HashTable(int size = 100);
+			HashTable(size_t size = 100);
 			
-			void Set(int);
+			void Set(size_t);
 			void MakeEmpty();
 			int Size();
 			bool Insert(const HashObj &);
 			HashObj Retrieve(const string, bool &);
 			std::list<HashObj> GetList();
 			int activeCount();
+			void SetHash2_R(int newR);
+			int GetHash2_R();
+			int Collision();
 			
 		private:
-			enum EntryType { ACTIVE, EMPTY, DELETED };
+			//enum EntryType { ACTIVE, EMPTY, DELETED };
 			struct HashValue
 			{
 				HashObj element;
-				EntryType info;
+				int info;
 				
-				HashValue(const HashObj & e = HashObj(), EntryType i = EMPTY)
+				HashValue(const HashObj & e = HashObj(), int i = 0)
 				{
 					element = e;
 					info = i;
 				}			
 			};
 			
-			std::vector<HashValue> _symVector;
-			int _tblSize;
+			HashValue* _symVector;
+			size_t _tblSize;
+			int hash2_R;
+			int colCount;
 			
-			unsigned int nextPrime(const int);
-			int hash(const string &);
-			int hash2(const string &, int);
-			unsigned int HornersHash(const string, int);
+			unsigned int nextPrime(const unsigned int);
+			size_t hash(const string &);
+			size_t hash2(const string &, int);
+			size_t HornersHash(const string, int);
 			void rehash();
 			
 	};
 	
 	template <typename HashObj>
-	HashTable<HashObj>::HashTable(int size) : _symVector(nextPrime(size))
-	{ MakeEmpty(); _tblSize = _symVector.size();}
+	HashTable<HashObj>::HashTable(size_t size)
+	{
+		_tblSize = nextPrime(size);
+		_symVector = new HashValue[_tblSize];
+		MakeEmpty();
+		hash2_R = nextPrime(_tblSize / 10);
+		colCount = 0;
+	}
 	
 	template <typename HashObj>
-	void HashTable<HashObj>::Set(int size)
+	void HashTable<HashObj>::Set(size_t size)
 	{
-		_symVector.resize(nextPrime(size));
+		_tblSize = nextPrime(size);
+		_symVector = new HashValue[_tblSize];
 		MakeEmpty();
-		_tblSize = _symVector.size();
+		hash2_R = nextPrime(_tblSize / 10);
+		colCount = 0;
 	}
 	
 	template <typename HashObj>
 	void HashTable<HashObj>::MakeEmpty()
 	{
-		for(int i = 0; i < _symVector.size(); i++)
-			_symVector[i].info = EMPTY;
+		for(size_t i = 0; i < _tblSize; i++)
+			_symVector[i].info = 0;
 	}
 	
 	template <typename HashObj>
@@ -79,14 +92,18 @@ namespace Hash
 	bool HashTable<HashObj>::Insert(const HashObj & entry)
 	{
 		HashObj temp = entry;
-		int index = hash(temp.Name);
+		size_t index = hash(temp.Name);
 		
 		_symVector[index].element = entry;
-		_symVector[index].info = ACTIVE;
+		_symVector[index].info = 1;
 		
 		//rehash if need
-		if (activeCount() + 1 >= _symVector.size())
+		// TODO: rehashCount
+		if (activeCount() + 1 >= _tblSize)
+		{
 			rehash();
+			cout<<"\nrehash\n";
+		}
 		
 		return true;
 	}
@@ -94,10 +111,10 @@ namespace Hash
 	template <typename HashObj>
 	HashObj HashTable<HashObj>::Retrieve(const string key, bool & isFound)
 	{
-		int index = hash(key);
+		size_t index = hash(key);
 		HashValue retObj = _symVector[index];
 		
-		if (retObj.info != ACTIVE)
+		if (retObj.info != 1)
 			isFound = false;
 		else
 			isFound = true;
@@ -109,11 +126,28 @@ namespace Hash
 	std::list<HashObj> HashTable<HashObj>::GetList()
 	{
 		std::list<HashObj> tempList;
-		for(int i = 0; i < _symVector.size(); i++)
+		for(int i = 0; i < _tblSize; i++)
 			tempList.push_back(_symVector[i].element);
 		return tempList;
 	}
 	
+	template <typename HashObj>
+	void HashTable<HashObj>::SetHash2_R(int newR)
+	{
+		hash2_R = nextPrime(newR);
+	}
+	
+	template <typename HashObj>
+	int HashTable<HashObj>::GetHash2_R()
+	{
+		return hash2_R;
+	}
+	
+	template <typename HashObj>
+	int HashTable<HashObj>::Collision()
+	{
+		return colCount;
+	}
 	
 		// hi(x) = (hash(x) + f(i)) mod Table_Size
 		// hi(x) is an index in the table to insert x
@@ -127,52 +161,54 @@ namespace Hash
 		// R: is prime, smaller than the table size
 	
 	template <typename HashObj>
-	int HashTable<HashObj>::hash(const string & sym)
+	size_t HashTable<HashObj>::hash(const string & sym)
 	{
 		string temp = sym;
 		string strHash = temp;
 		
-		int currentPos = HornersHash(temp, _tblSize);
-		int offset = hash2(temp, 23);
+		size_t currentPos = HornersHash(temp, _tblSize);
+		size_t offset = hash2(temp, hash2_R);
 		
-		while(_symVector[currentPos].info != EMPTY && _symVector[currentPos].element.Name != temp)
+		while(_symVector[currentPos].info == 1 && _symVector[currentPos].element.Name != temp)
 		{
+			// TODO: collision count
+			colCount++;
 			currentPos += offset;
-			if (currentPos >= _symVector.size())
-				currentPos -= _symVector.size();
+			if (currentPos >= _tblSize)
+				currentPos -= _tblSize;
 		}
 		
 		return currentPos;
 	}
 	
 	template <typename HashObj>
-	int HashTable<HashObj>::hash2(const string & sym, int R)
+	size_t HashTable<HashObj>::hash2(const string & sym, int R)
 	{
-		unsigned int hashVal = 0;
+		size_t hashVal = 0;
 		string strName = sym;
 		for(int i = 0; i < strName.size(); i++)
-			hashVal = 37 * hashVal + strName[i];
+			hashVal = (37 * hashVal + strName[i]) % R;
 			
-		return R - (hashVal % R);
+		return R - hashVal;
 	}
 	
 	template <typename HashObj>
-	unsigned int HashTable<HashObj>::HornersHash(const string sym, int tableSize)
+	size_t HashTable<HashObj>::HornersHash(const string sym, int tableSize)
 	{
-		unsigned int hashVal = 0;
+		size_t hashVal = 0;
 		string strName = sym;
 		for(int i = 0; i < strName.size(); i++)
 		{
-			hashVal = (37 * hashVal + strName[i]);
+			hashVal = (37 * hashVal + strName[i]) % tableSize;
 		}
 		
-		return hashVal % tableSize;
+		return hashVal;
 	}
 	
 	template <typename HashObj>
-	unsigned int HashTable<HashObj>::nextPrime(const int num)
+	unsigned int HashTable<HashObj>::nextPrime(const unsigned int num)
 	{
-		int newPrime = num;
+		unsigned int newPrime = num;
 		bool foundPrime = false;
 		
 		while (!foundPrime)
@@ -193,15 +229,17 @@ namespace Hash
 	template <typename HashObj>
 	void HashTable<HashObj>::rehash()
 	{
-		std::vector<HashValue> oldArray = _symVector;
+		HashValue* oldArray = _symVector;
 		
-		_tblSize = nextPrime( 2 * oldArray.size());
-		_symVector.resize(_tblSize);
-		for(int i = 0; i < _tblSize; i++)
-			_symVector[i].info = EMPTY;
+		size_t oldSize = _tblSize;
+		_tblSize = nextPrime( 2 * oldSize);
+		_symVector = new HashValue[_tblSize];
 		
-		for(int i = 0; i < oldArray.size(); i++)
-			if(oldArray[i].info == ACTIVE)
+		for(size_t i = 0; i < _tblSize; i++)
+			_symVector[i].info = 0;
+		
+		for(size_t i = 0; i < oldSize; i++)
+			if(oldArray[i].info == 1)
 				Insert(oldArray[i].element);
 	}
 	
@@ -209,8 +247,8 @@ namespace Hash
 	int HashTable<HashObj>::activeCount()
 	{
 		int cnt = 0;
-		for(int i = 0; i < _symVector.size(); i++)
-			if(_symVector[i].info == ACTIVE)
+		for(int i = 0; i < _tblSize; i++)
+			if(_symVector[i].info == 1)
 				cnt++;
 		return cnt;
 	}
