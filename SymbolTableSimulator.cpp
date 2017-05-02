@@ -28,10 +28,11 @@ void AddSymbolToList(std::list<Symbol> &, std::list<Symbol> &);
 void AddSymbolToHashTable(Hash::HashTable<Symbol> &);
 void SearchFromList(std::list<Symbol> &);
 void SearchFromHashTable(Hash::HashTable<Symbol> &);
-void PrintSymbolTable(std::list<Symbol> &);
+void PrintSymbolTable(std::list<Symbol> &, char *);
 void PrintHashTable(Hash::HashTable<Symbol> &);
 void _PrintBanner();
 bool _PreloadDataset(char *, std::list<Symbol> &);
+bool _SaveListToFile(char *, std::list<Symbol> &);
 void _PrintElapsedTime(SimpleTimer &);
 Symbol _ExtractSymbol(string);
 
@@ -90,8 +91,8 @@ int main()
 					cin>>subChoice;
 					switch(subChoice)
 					{
-					case 'a': PrintSymbolTable(symbolTableRaw); break;
-					case 'b': PrintSymbolTable(symbolTableCopy); break;
+					case 'a': PrintSymbolTable(symbolTableRaw, "raw"); break;
+					case 'b': PrintSymbolTable(symbolTableCopy, "sorted"); break;
 					case 'c': PrintHashTable(symbolHashT); break;
 					}
 				} while(subChoice != 'd');
@@ -111,7 +112,7 @@ void SortSymbolTable(std::list<Symbol> & symbolTable)
 	char choice;
 	cin>>choice;
 	if (choice == 'y' || choice == 'Y')
-		PrintSymbolTable(symbolTable);
+		PrintSymbolTable(symbolTable, "sorted");
 }
 
 void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<Symbol> & symbolTable)
@@ -260,10 +261,14 @@ void SearchFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	} while (choice == 'y' || choice == 'Y');
 }
 
-void PrintSymbolTable(std::list<Symbol> & symbolTable)
+void PrintSymbolTable(std::list<Symbol> & symbolTable, char * listType)
 {
 	ClearScreen();
 	unsigned int symbolCount = symbolTable.size();
+	bool savedToFile;
+	char outputFileName[80] = "list_";
+	strcat(outputFileName, listType);
+	strcat(outputFileName, ".csv");
 	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
 	if (symbolCount > 0)
 	{
@@ -280,7 +285,12 @@ void PrintSymbolTable(std::list<Symbol> & symbolTable)
 				<<std::left<<std::setw(18)<<std::setfill(' ')<<it->Type
 				<<std::left<<std::setw(15)<<std::setfill(' ')<<it->Scope;
 		}
+		savedToFile = _SaveListToFile(outputFileName,symbolTable);
 	}
+	if (savedToFile)
+		cout<<"\n\nOutput saved to "<<outputFileName;
+	else
+		cout<<"\n\nOutput not successfully saved to file";
 	getch();
 }
 
@@ -288,6 +298,9 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 {
 	ClearScreen();
 	unsigned int symbolCount = symbolHashTable.Size();
+	bool savedToFile;
+	char * outputFileName = "hashtable.csv";
+
 	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
 	if (symbolCount > 0)
 	{
@@ -309,8 +322,13 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 				<<std::left<<std::setw(15)<<std::setfill(' ')<<it->Scope;
 			index++;
 		}
+		savedToFile = _SaveListToFile(outputFileName, tempList);
 	}
 	cout<<"\n\nTotal used slot: "<<symbolHashTable.activeCount()<<endl;
+	if (savedToFile)
+		cout<<"Output saved to "<<outputFileName;
+	else
+		cout<<"Output not successfully saved to file";
 	cout<<endl;
 	getch();
 }
@@ -324,6 +342,11 @@ void _PrintBanner()
         <<" =========================="<<endl<<endl;
 }
 
+void _PrintElapsedTime(SimpleTimer & stopwatch)
+{
+	cout<<"\nTime taken: "<<stopwatch.Elapsed_ms_str();
+}
+
 bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 {
 	std::ifstream myfile (fileName);
@@ -333,6 +356,7 @@ bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 		std::getline(myfile, line); //ignore header
 		while(std::getline(myfile, line))
 			table.push_back(_ExtractSymbol(line));
+		myfile.close();
 		return true;
 	}
 	else
@@ -351,9 +375,23 @@ Symbol _ExtractSymbol(string line)
 	return newSymbol;
 }
 
-void _PrintElapsedTime(SimpleTimer & stopwatch)
+bool _SaveListToFile(char* fileName, std::list<Symbol> & symbolTable)
 {
-	cout<<"\nTime taken: "<<stopwatch.Elapsed_ms_str();
+	std::ofstream myfile(fileName, std::ofstream::out | std::ofstream::trunc);
+	 if (myfile.is_open())
+	 {
+		 myfile<<"Symbol Name"<<","<<"Type"<<","<<"Scope"<<endl;
+		 for (std::list<Symbol>::iterator it=symbolTable.begin(); it != symbolTable.end(); ++it)
+			 myfile<<it->Name<<","<<it->Type<<","<<it->Scope<<endl;
+		 myfile.close();
+		 return true;
+	 }
+	 else
+		 return false;
 }
+
+
+
+
 
 
