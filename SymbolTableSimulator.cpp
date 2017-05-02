@@ -32,6 +32,7 @@ void PrintSymbolTable(std::list<Symbol> &);
 void PrintHashTable(Hash::HashTable<Symbol> &);
 void _PrintBanner();
 bool _PreloadDataset(char *, std::list<Symbol> &);
+void _PrintElapsedTime(SimpleTimer &);
 Symbol _ExtractSymbol(string);
 
 // -------------------------------------------------------------
@@ -116,6 +117,7 @@ void SortSymbolTable(std::list<Symbol> & symbolTable)
 void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
+	SimpleTimer stopwatch(true);
 	symbolHashTable.Set(symbolTable.size());
 	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
 	for(int i = 0; i < symbolTable.size(); i++)
@@ -124,32 +126,40 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 	}
 	
 	cout<<"\nTotal symbols added: "<<symbolHashTable.Size()<<"\n";
+	_PrintElapsedTime(stopwatch);
 	getch();
 }
 
 void AddSymbolToList(std::list<Symbol> & rawSymbolTable, std::list<Symbol> & sortedSymbolTable)
 {
 	Symbol newSymbol, searchResult;
+	SimpleTimer stopwatch;
 	char choice;
 	do
 	{
 		ClearScreen();
 		cout<<"Symbol name: ";
 		cin>>newSymbol.Name;
+		stopwatch.Restart();
 		if(BinarySearch(sortedSymbolTable, newSymbol.Name, searchResult))
+		{
 			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' already exists.";
+		}
 		else
 		{
+			stopwatch.Pause();
 			cout<<"       Type: ";
 			cin>>newSymbol.Type;
 			cout<<"      Scope: ";
 			cin>>newSymbol.Scope;
 			//stuff below is not so efficient.. we'll make things work for now
+			stopwatch.Start();
 			rawSymbolTable.push_back(newSymbol);
 			sortedSymbolTable.push_back(newSymbol);
 			sortedSymbolTable.sort(CompareSymbols);
 			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' successfully added to the list.";
 		}
+		_PrintElapsedTime(stopwatch);
 		cout<<endl<<endl<<"Try to add another symbol? (y/n) ";
 		cin>>choice;
 	} while (choice == 'y' || choice == 'Y');
@@ -160,23 +170,31 @@ void AddSymbolToHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	Symbol newSymbol, searchResult;
 	char choice;
 	bool alreadyExist;
+	SimpleTimer stopwatch;
 	do
 	{
 		ClearScreen();
 		cout<<"** Adding new Symbol to Hash Table **\n";
 		cout<<"Symbol name: ";
 		cin>>newSymbol.Name;
+		stopwatch.Restart();
 		symbolHashTable.Retrieve(newSymbol.Name, alreadyExist);		
 		if(alreadyExist)
+		{
 			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' already exists.";
+			_PrintElapsedTime(stopwatch);
+		}
 		else
 		{
+			stopwatch.Pause();
 			cout<<"       Type: ";
 			cin>>newSymbol.Type;
 			cout<<"      Scope: ";
 			cin>>newSymbol.Scope;
+			stopwatch.Start();
 			symbolHashTable.Insert(newSymbol);
 			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' successfully added to the Hash list.";
+			_PrintElapsedTime(stopwatch);
 		}
 		cout<<endl<<endl<<"Try to add another symbol? (y/n) ";
 		cin>>choice;
@@ -188,11 +206,13 @@ void SearchFromList(std::list<Symbol> & symbolTable)
 	string symbolName;
 	Symbol result;
 	char choice;
+	SimpleTimer stopwatch;
 	do
 	{
 		ClearScreen();
 		cout<<"Enter symbol name to search: ";
 		cin>>symbolName;
+		stopwatch.Start();
 		bool found = BinarySearch(symbolTable, symbolName, result);
 		if (found)
 		{
@@ -203,7 +223,7 @@ void SearchFromList(std::list<Symbol> & symbolTable)
 		}
 		else
 			cout<<endl<<"Symbol '"<<symbolName<<"' not found.";
-
+		_PrintElapsedTime(stopwatch);
 		cout<<endl<<endl<<"Perform another search? (y/n) ";
 		cin>>choice;
 	} while (choice == 'y' || choice == 'Y');
@@ -213,6 +233,7 @@ void SearchFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 {
 	string symbolName;
 	Symbol result;
+	SimpleTimer stopwatch;
 	char choice;
 	bool isFound;
 	do
@@ -222,6 +243,7 @@ void SearchFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 		cout<<"\nsize: "<<symbolHashTable.Size()<<"\n";
 		cout<<"Enter symbol name to search: ";
 		cin>>symbolName;
+		stopwatch.Start();
 		result = symbolHashTable.Retrieve(symbolName, isFound);
 		if (isFound)
 		{
@@ -232,7 +254,7 @@ void SearchFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 		}
 		else
 			cout<<endl<<"Symbol '"<<symbolName<<"' not found.";
-
+		_PrintElapsedTime(stopwatch);
 		cout<<endl<<endl<<"Perform another search? (y/n) ";
 		cin>>choice;
 	} while (choice == 'y' || choice == 'Y');
@@ -327,6 +349,11 @@ Symbol _ExtractSymbol(string line)
 	newSymbol.Type = line.substr(comma1 + 1, comma2 - comma1 - 1);
 	newSymbol.Scope = line.substr(comma2 + 1);
 	return newSymbol;
+}
+
+void _PrintElapsedTime(SimpleTimer & stopwatch)
+{
+	cout<<"\nTime taken: "<<stopwatch.Elapsed_ms_str();
 }
 
 
