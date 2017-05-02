@@ -11,7 +11,6 @@
 #include <conio.h>
 #include <stdio.h>
 #include <iomanip>
-#include <ctime>
 #include "utils.h"
 #include "hash.h"
 
@@ -136,23 +135,16 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 		cout<<"Specify input array size (1 to 1,000,000): ";
 		cin>>symCounts;
 	} while(symCounts < 1 || symCounts > 1000000);
-	SimpleTimer stopwatch(true);
 	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
-	clock_t start = std::clock();
+	SimpleTimer stopwatch(true);
 	for(int i = 0; i < symCounts; i++)
-	{
 		symbolHashTable.Insert(symbolVTbl[i]);
-		if (i%1000 == 0)
-			cout<<"index: "<<i<<endl;
-	}
-	double duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-	cout<<"duration: "<<duration<<" sec\n";
-	cout<<"hash2_R: "<<symbolHashTable.GetHash2_R()<<"\n";
+	_PrintElapsedTime(stopwatch);
+	cout<<"\nhash2_R: "<<symbolHashTable.GetHash2_R()<<"\n";
 	cout<<"table size: "<<symbolHashTable.Size()<<"\n";
 	cout<<"collision: "<<symbolHashTable.Collision()<<"\n";
 	
 	cout<<"\nTotal symbols added: "<<symbolHashTable.activeCount()<<"\n";
-	_PrintElapsedTime(stopwatch);
 	getch();
 }
 
