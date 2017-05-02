@@ -118,7 +118,6 @@ void SortSymbolTable(std::list<Symbol> & symbolTable)
 void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
-<<<<<<< HEAD
 	size_t tblsize, symCounts;
 	int hash2R;
 	do {
@@ -137,10 +136,7 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 		cout<<"Specify input array size (1 to 1,000,000): ";
 		cin>>symCounts;
 	} while(symCounts < 1 || symCounts > 1000000);
-=======
 	SimpleTimer stopwatch(true);
-	symbolHashTable.Set(symbolTable.size());
->>>>>>> refs/remotes/origin/master
 	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
 	clock_t start = std::clock();
 	for(int i = 0; i < symCounts; i++)
@@ -155,12 +151,8 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 	cout<<"table size: "<<symbolHashTable.Size()<<"\n";
 	cout<<"collision: "<<symbolHashTable.Collision()<<"\n";
 	
-<<<<<<< HEAD
 	cout<<"\nTotal symbols added: "<<symbolHashTable.activeCount()<<"\n";
-=======
-	cout<<"\nTotal symbols added: "<<symbolHashTable.Size()<<"\n";
 	_PrintElapsedTime(stopwatch);
->>>>>>> refs/remotes/origin/master
 	getch();
 }
 
