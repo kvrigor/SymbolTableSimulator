@@ -34,8 +34,6 @@ uint64 GetTimeMs64()
 }
 
 //Class encapsulating the measurement of elapsed time.
-//NOTE: Elapsed_ms() doesn't include a check
-//      whether the timer has been started or stopped
 class SimpleTimer
 {
 	private:
