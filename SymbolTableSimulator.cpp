@@ -43,7 +43,7 @@ int main()
 	std::list<Symbol> symbolTableRaw;
 	Hash::HashTable<Symbol> symbolHashT;
 
-	char * datasetFile = "symbol_table_mock1.csv";
+	char * datasetFile = "symbol_table_1M.csv";
 	if (!_PreloadDataset(datasetFile, symbolTableRaw))
 	{
 		cout << "Unable to open file "<<datasetFile;
@@ -117,16 +117,34 @@ void SortSymbolTable(std::list<Symbol> & symbolTable)
 void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
-	SimpleTimer stopwatch(true);
-	symbolHashTable.Set(symbolTable.size());
+	size_t tblsize, symCounts;
+	int hash2R;
+	do {
+		cout<<"Specify initial table size (1 to 1,000,000): ";
+		cin>>tblsize;
+	} while(tblsize < 1 || tblsize > 1000000);
+	symbolHashTable.Set(tblsize);
+	do {
+		cout<<"Specify hash2 function's R value (1 to "<<tblsize * 0.9<<", use 0 for auto): ";
+		cin>>hash2R;
+	} while(hash2R < 0 || hash2R > tblsize * 0.9);
+	if (hash2R == 0)
+		hash2R = tblsize / 10;
+	symbolHashTable.SetHash2_R(hash2R);
+	do {
+		cout<<"Specify input array size (1 to 1,000,000): ";
+		cin>>symCounts;
+	} while(symCounts < 1 || symCounts > 1000000);
 	std::vector<Symbol> symbolVTbl(symbolTable.begin(),symbolTable.end());
-	for(int i = 0; i < symbolTable.size(); i++)
-	{
+	SimpleTimer stopwatch(true);
+	for(int i = 0; i < symCounts; i++)
 		symbolHashTable.Insert(symbolVTbl[i]);
-	}
-	
-	cout<<"\nTotal symbols added: "<<symbolHashTable.Size()<<"\n";
 	_PrintElapsedTime(stopwatch);
+	cout<<"\nhash2_R: "<<symbolHashTable.GetHash2_R()<<"\n";
+	cout<<"table size: "<<symbolHashTable.Size()<<"\n";
+	cout<<"collision: "<<symbolHashTable.Collision()<<"\n";
+	
+	cout<<"\nTotal symbols added: "<<symbolHashTable.activeCount()<<"\n";
 	getch();
 }
 
