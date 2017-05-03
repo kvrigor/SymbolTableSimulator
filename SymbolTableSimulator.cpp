@@ -22,17 +22,18 @@ using namespace CustomTypes;
 using namespace SearchAlgorithms;
 
 // -----------------------  prototypes -----------------------
-void SortSymbolTable(std::list<Symbol> &);
 void CreateHashTable(Hash::HashTable<Symbol> &, const std::list<Symbol> &);
-void AddSymbolToList(std::list<Symbol> &, std::list<Symbol> &);
+void AddSymbolToList(std::vector<Symbol> &);
 void AddSymbolToHashTable(Hash::HashTable<Symbol> &);
-void SearchFromList(std::list<Symbol> &);
+void SearchFromList(std::vector<Symbol> &);
 void SearchFromHashTable(Hash::HashTable<Symbol> &);
-void PrintSymbolTable(std::list<Symbol> &, char *);
+void PrintSymbolTable(std::list<Symbol> &);
+void PrintSymbolTable(std::vector<Symbol> &);
 void PrintHashTable(Hash::HashTable<Symbol> &);
 void _PrintBanner();
 bool _PreloadDataset(char *, std::list<Symbol> &);
 bool _SaveListToFile(char *, std::list<Symbol> &);
+bool _SaveListToFile(char *, std::vector<Symbol> &);
 void _PrintElapsedTime(SimpleTimer &);
 Symbol _ExtractSymbol(string);
 
@@ -53,31 +54,32 @@ int main()
 	else
 	{
 		std::list<Symbol> symbolTableCopy(symbolTableRaw);
+		symbolTableCopy.sort(CompareSymbols);
+		std::vector<Symbol> symbolTableSorted(symbolTableCopy.begin(), symbolTableCopy.end());
+
 		char choice;
 		do
 		{
 			ClearScreen();
 			_PrintBanner();
-			cout<<"  [1] Create sorted list from dataset\n"
-				<<"  [2] Create hash table from dataset\n"
-				<<"  [3] Add new symbol to list\n"
-				<<"  [4] Add new symbol to hash table\n"
-				<<"  [5] Search symbol from sorted list using binary search\n"
-				<<"  [6] Search symbol from hash table\n"
-				<<"  [7] Print symbol table\n"
-				<<"  [8] Exit\n"
+			cout<<"  [1] Create hash table from dataset\n"
+				<<"  [2] Add new symbol to list\n"
+				<<"  [3] Add new symbol to hash table\n"
+				<<"  [4] Search symbol from sorted list using binary search\n"
+				<<"  [5] Search symbol from hash table\n"
+				<<"  [6] Print symbol table\n"
+				<<"  [7] Exit\n"
 				<<"  Enter your choice: ";
 			cin>>choice;
 
 			switch(choice)
 			{
-			case '1': SortSymbolTable(symbolTableCopy); break;
-			case '2': CreateHashTable(symbolHashT, symbolTableCopy); break;
-			case '3': AddSymbolToList(symbolTableRaw, symbolTableCopy); break;
-			case '4': AddSymbolToHashTable(symbolHashT); break;
-			case '5': SearchFromList(symbolTableCopy); break;
-			case '6': SearchFromHashTable(symbolHashT); break;
-			case '7':
+			case '1': CreateHashTable(symbolHashT, symbolTableCopy); break;
+			case '2': AddSymbolToList(symbolTableSorted); break;
+			case '3': AddSymbolToHashTable(symbolHashT); break;
+			case '4': SearchFromList(symbolTableSorted); break;
+			case '5': SearchFromHashTable(symbolHashT); break;
+			case '6':
 				char subChoice;
 				do
 				{
@@ -91,30 +93,19 @@ int main()
 					cin>>subChoice;
 					switch(subChoice)
 					{
-					case 'a': PrintSymbolTable(symbolTableRaw, "raw"); break;
-					case 'b': PrintSymbolTable(symbolTableCopy, "sorted"); break;
+					case 'a': PrintSymbolTable(symbolTableRaw); break;
+					case 'b': PrintSymbolTable(symbolTableSorted); break;
 					case 'c': PrintHashTable(symbolHashT); break;
 					}
 				} while(subChoice != 'd');
 				break;
 			}
-		} while(choice != '8');
+		} while(choice != '7');
 	}
 	return 0;
 }
 
 // ----------------------- Main menu methods -----------------------
-void SortSymbolTable(std::list<Symbol> & symbolTable)
-{
-	ClearScreen();
-	symbolTable.sort(CompareSymbols);
-	cout<<"Sorting done. Display sorted symbol table? (y/n) ";
-	char choice;
-	cin>>choice;
-	if (choice == 'y' || choice == 'Y')
-		PrintSymbolTable(symbolTable, "sorted");
-}
-
 void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
@@ -131,7 +122,7 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 	getch();
 }
 
-void AddSymbolToList(std::list<Symbol> & rawSymbolTable, std::list<Symbol> & sortedSymbolTable)
+void AddSymbolToList(std::vector<Symbol> & symbolTable)
 {
 	Symbol newSymbol, searchResult;
 	SimpleTimer stopwatch;
@@ -141,11 +132,9 @@ void AddSymbolToList(std::list<Symbol> & rawSymbolTable, std::list<Symbol> & sor
 		ClearScreen();
 		cout<<"Symbol name: ";
 		cin>>newSymbol.Name;
-		stopwatch.Restart();
-		if(BinarySearch(sortedSymbolTable, newSymbol.Name, searchResult))
-		{
+
+		if(BinarySearch(symbolTable, newSymbol.Name, searchResult))
 			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' already exists.";
-		}
 		else
 		{
 			stopwatch.Pause();
@@ -153,14 +142,14 @@ void AddSymbolToList(std::list<Symbol> & rawSymbolTable, std::list<Symbol> & sor
 			cin>>newSymbol.Type;
 			cout<<"      Scope: ";
 			cin>>newSymbol.Scope;
-			//stuff below is not so efficient.. we'll make things work for now
-			stopwatch.Start();
-			rawSymbolTable.push_back(newSymbol);
-			sortedSymbolTable.push_back(newSymbol);
-			sortedSymbolTable.sort(CompareSymbols);
-			cout<<endl<<"Symbol '"<<newSymbol.Name<<"' successfully added to the list.";
+			stopwatch.Restart();
+			if (BinaryInsert(symbolTable, newSymbol))
+			{
+				cout<<endl<<"Symbol '"<<newSymbol.Name<<"' successfully added to the list.";
+				_PrintElapsedTime(stopwatch);
+			}
 		}
-		_PrintElapsedTime(stopwatch);
+
 		cout<<endl<<endl<<"Try to add another symbol? (y/n) ";
 		cin>>choice;
 	} while (choice == 'y' || choice == 'Y');
@@ -202,7 +191,7 @@ void AddSymbolToHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	} while (choice == 'y' || choice == 'Y');
 }
 
-void SearchFromList(std::list<Symbol> & symbolTable)
+void SearchFromList(std::vector<Symbol> & symbolTable)
 {
 	string symbolName;
 	Symbol result;
@@ -261,14 +250,12 @@ void SearchFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	} while (choice == 'y' || choice == 'Y');
 }
 
-void PrintSymbolTable(std::list<Symbol> & symbolTable, char * listType)
+void PrintSymbolTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
 	unsigned int symbolCount = symbolTable.size();
 	bool savedToFile;
-	char outputFileName[80] = "list_";
-	strcat(outputFileName, listType);
-	strcat(outputFileName, ".csv");
+	char * outputFileName = "list_raw.csv";
 	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
 	if (symbolCount > 0)
 	{
@@ -279,6 +266,37 @@ void PrintSymbolTable(std::list<Symbol> & symbolTable, char * listType)
 			<<std::left<<std::setw(18)<<std::setfill(' ')<<"Type"
 			<<std::left<<std::setw(15)<<std::setfill(' ')<<"Scope"<<endl<<endl;
 		for (std::list<Symbol>::iterator it=symbolTable.begin(); it != symbolTable.end(); ++it)
+		{
+			cout<<endl
+				<<std::left<<std::setw(20)<<std::setfill(' ')<<it->Name
+				<<std::left<<std::setw(18)<<std::setfill(' ')<<it->Type
+				<<std::left<<std::setw(15)<<std::setfill(' ')<<it->Scope;
+		}
+		savedToFile = _SaveListToFile(outputFileName,symbolTable);
+	}
+	if (savedToFile)
+		cout<<"\n\nOutput saved to "<<outputFileName;
+	else
+		cout<<"\n\nOutput not successfully saved to file";
+	getch();
+}
+
+void PrintSymbolTable(std::vector<Symbol> & symbolTable)
+{
+	ClearScreen();
+	unsigned int symbolCount = symbolTable.size();
+	bool savedToFile;
+	char * outputFileName = "list_sorted.csv";
+	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
+	if (symbolCount > 0)
+	{
+		SetConsoleBufferHeight(5 + symbolCount);
+
+		cout<<endl
+			<<std::left<<std::setw(20)<<std::setfill(' ')<<"Symbol Name"
+			<<std::left<<std::setw(18)<<std::setfill(' ')<<"Type"
+			<<std::left<<std::setw(15)<<std::setfill(' ')<<"Scope"<<endl<<endl;
+		for (std::vector<Symbol>::iterator it=symbolTable.begin(); it != symbolTable.end(); ++it)
 		{
 			cout<<endl
 				<<std::left<<std::setw(20)<<std::setfill(' ')<<it->Name
@@ -390,6 +408,20 @@ bool _SaveListToFile(char* fileName, std::list<Symbol> & symbolTable)
 		 return false;
 }
 
+bool _SaveListToFile(char* fileName, std::vector<Symbol> & symbolTable)
+{
+	std::ofstream myfile(fileName, std::ofstream::out | std::ofstream::trunc);
+	 if (myfile.is_open())
+	 {
+		 myfile<<"Symbol Name"<<","<<"Type"<<","<<"Scope"<<endl;
+		 for (std::vector<Symbol>::iterator it=symbolTable.begin(); it != symbolTable.end(); ++it)
+			 myfile<<it->Name<<","<<it->Type<<","<<it->Scope<<endl;
+		 myfile.close();
+		 return true;
+	 }
+	 else
+		 return false;
+}
 
 
 
