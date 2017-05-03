@@ -27,6 +27,8 @@ void AddSymbolToList(std::vector<Symbol> &);
 void AddSymbolToHashTable(Hash::HashTable<Symbol> &);
 void SearchFromList(std::vector<Symbol> &);
 void SearchFromHashTable(Hash::HashTable<Symbol> &);
+void DeleteFromList(std::vector<Symbol> &);
+void DeleteFromHashTable(Hash::HashTable<Symbol> &);
 void PrintSymbolTable(std::list<Symbol> &);
 void PrintSymbolTable(std::vector<Symbol> &);
 void PrintHashTable(Hash::HashTable<Symbol> &);
@@ -67,8 +69,10 @@ int main()
 				<<"  [3] Add new symbol to hash table\n"
 				<<"  [4] Search symbol from sorted list using binary search\n"
 				<<"  [5] Search symbol from hash table\n"
-				<<"  [6] Print symbol table\n"
-				<<"  [7] Exit\n"
+				<<"  [6] Delete symbol from list\n"
+				<<"  [7] Delete symbol from hash table\n"
+				<<"  [8] Print symbol table\n"
+				<<"  [9] Exit\n"
 				<<"  Enter your choice: ";
 			cin>>choice;
 
@@ -79,7 +83,9 @@ int main()
 			case '3': AddSymbolToHashTable(symbolHashT); break;
 			case '4': SearchFromList(symbolTableSorted); break;
 			case '5': SearchFromHashTable(symbolHashT); break;
-			case '6':
+			case '6': DeleteFromList(symbolTableSorted); break;
+			case '7': DeleteFromHashTable(symbolHashT); break;
+			case '8':
 				char subChoice;
 				do
 				{
@@ -100,7 +106,7 @@ int main()
 				} while(subChoice != 'd');
 				break;
 			}
-		} while(choice != '7');
+		} while(choice != '9');
 	}
 	return 0;
 }
@@ -202,8 +208,9 @@ void SearchFromList(std::vector<Symbol> & symbolTable)
 		ClearScreen();
 		cout<<"Enter symbol name to search: ";
 		cin>>symbolName;
-		stopwatch.Start();
+		stopwatch.Restart();
 		bool found = BinarySearch(symbolTable, symbolName, result);
+		stopwatch.Pause();
 		if (found)
 		{
 			cout<<endl<<endl;
@@ -250,6 +257,43 @@ void SearchFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	} while (choice == 'y' || choice == 'Y');
 }
 
+void DeleteFromList(std::vector<Symbol> & symbolTable)
+{
+	string symbolName;
+	char choice;
+	SimpleTimer stopwatch;
+	do
+	{
+		ClearScreen();
+		cout<<"Enter symbol name to delete: ";
+		cin>>symbolName;
+		stopwatch.Restart();
+		bool deleted = BinaryDelete(symbolTable, symbolName);
+		stopwatch.Pause();
+		if (deleted)
+			cout<<endl<<"Symbol '"<<symbolName<<"' successfully deleted.";
+		else
+			cout<<endl<<"Symbol '"<<symbolName<<"' not found.";
+		_PrintElapsedTime(stopwatch);
+		cout<<endl<<endl<<"Delete another symbol? (y/n) ";
+		cin>>choice;
+	} while (choice == 'y' || choice == 'Y');
+}
+
+void DeleteFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
+{
+	ClearScreen();
+	cout<<"DeleteFromHashTable work in progress...";
+//	string symbolName;
+//	char choice;
+//	SimpleTimer stopwatch;
+//	do
+//	{
+//		ClearScreen();
+//		cin>>choice;
+//	} while (choice == 'y' || choice == 'Y');
+}
+
 void PrintSymbolTable(std::list<Symbol> & symbolTable)
 {
 	ClearScreen();
@@ -290,8 +334,7 @@ void PrintSymbolTable(std::vector<Symbol> & symbolTable)
 	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
 	if (symbolCount > 0)
 	{
-		SetConsoleBufferHeight(5 + symbolCount);
-
+		SetConsoleBufferHeight(15 + symbolCount);
 		cout<<endl
 			<<std::left<<std::setw(20)<<std::setfill(' ')<<"Symbol Name"
 			<<std::left<<std::setw(18)<<std::setfill(' ')<<"Type"
@@ -322,7 +365,7 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
 	if (symbolCount > 0)
 	{
-		SetConsoleBufferHeight(5 + symbolCount);
+		SetConsoleBufferHeight(15 + symbolCount);
 		std::list<Symbol> tempList = symbolHashTable.GetList();
 		int index = 0;
 
