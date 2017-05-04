@@ -22,6 +22,7 @@ namespace Hash
 			int Size();
 			bool Insert(const HashObj &);
 			HashObj Retrieve(const string, bool &);
+			bool Delete(const string);
 			std::list<HashObj> GetList();
 			int activeCount();
 			void SetHash2_R(int newR);
@@ -102,13 +103,9 @@ namespace Hash
 		_symVector[index].info = 1;
 		active++;
 		
-		//rehash if need
-		// TODO: rehashCount
-		if (active + 1 >= _tblSize)
-		{
+		// Rehash at 75% LF
+		if (4 * active >= 3 * _tblSize)
 			rehash();
-			cout<<"\nrehash\n";
-		}
 		
 		return true;
 	}
@@ -125,6 +122,21 @@ namespace Hash
 			isFound = true;
 		
 		return retObj.element;
+	}
+	
+	template <typename HashObj>
+	bool HashTable<HashObj>::Delete(const string key)
+	{
+		size_t index = hash(key);
+		HashValue retObj = _symVector[index];
+		
+		if (retObj.info == 1)
+		{
+			retObj.info = -1;
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	template <typename HashObj>
@@ -174,7 +186,7 @@ namespace Hash
 		size_t currentPos = HornersHash(temp, _tblSize);
 		size_t offset = hash2(temp, hash2_R);
 		
-		while(_symVector[currentPos].info == 1 && _symVector[currentPos].element.Name != temp)
+		while(_symVector[currentPos].info != 0 && _symVector[currentPos].element.Name != temp)
 		{
 			// TODO: collision count
 			colCount++;

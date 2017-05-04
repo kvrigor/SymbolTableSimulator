@@ -300,16 +300,25 @@ void DeleteFromList(std::vector<Symbol> & symbolTable)
 
 void DeleteFromHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 {
-	ClearScreen();
-	cout<<"DeleteFromHashTable work in progress...";
-//	string symbolName;
-//	char choice;
-//	SimpleTimer stopwatch;
-//	do
-//	{
-//		ClearScreen();
-//		cin>>choice;
-//	} while (choice == 'y' || choice == 'Y');
+	string symbolName;
+	char choice;
+	SimpleTimer stopwatch;
+	do
+	{
+		ClearScreen();
+		cout<<"Enter symbol name to delete: ";
+		cin>>symbolName;
+		stopwatch.Restart();
+		bool deleted = symbolHashTable.Delete(symbolName);
+		stopwatch.Pause();
+		if (deleted)
+			cout<<endl<<"Symbol '"<<symbolName<<"' successfully deleted.";
+		else
+			cout<<endl<<"Symbol '"<<symbolName<<"' not found.";
+		_PrintElapsedTime(stopwatch);
+		cout<<endl<<endl<<"Delete another symbol? (y/n) ";
+		cin>>choice;
+	} while (choice == 'y' || choice == 'Y');
 }
 
 void PrintSymbolTable(std::list<Symbol> & symbolTable)
