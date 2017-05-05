@@ -59,6 +59,7 @@ int main()
 		symbolTableCopy.sort(CompareSymbols);
 		std::vector<Symbol> symbolTableSorted(symbolTableCopy.begin(), symbolTableCopy.end());
 
+
 		char choice;
 		do
 		{
@@ -437,14 +438,37 @@ void _PrintElapsedTime(SimpleTimer & stopwatch)
 
 bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 {
+	int tableSize;
+	do
+	{
+		ClearScreen();
+		cout<<"Enter desired table size: (1-1000000) ";
+		cin>>tableSize;
+		if (tableSize < 1 or tableSize > 1000000)
+		{
+			cout<<endl<<"Invalid table size.";
+			getch();
+		}
+	}while(tableSize < 1 or tableSize > 1000000);
+
+	cout<<endl<<"Loading dataset...";
+	SimpleTimer stopwatch(true);
 	std::ifstream myfile (fileName);
 	if (myfile.good())
 	{
 		string line;
 		std::getline(myfile, line); //ignore header
-		while(std::getline(myfile, line))
+		for (int i = 0; i < tableSize; i++)
+		{
+			std::getline(myfile, line);
 			table.push_back(_ExtractSymbol(line));
+		}
+//
+//		while(std::getline(myfile, line))
+//			table.push_back(_ExtractSymbol(line));
 		myfile.close();
+		cout<<endl<<"Success! Operation took "<<stopwatch.Elapsed_ms_str();
+		getch();
 		return true;
 	}
 	else
