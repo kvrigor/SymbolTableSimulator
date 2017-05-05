@@ -413,9 +413,40 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 
 void AddSymbolToList_Many(std::vector<Symbol> & symbolTable)
 {
-	ClearScreen();
-	cout<<"AddSymbolToList_Many() work in progress...";
-	getch();
+	int numNewSymbols;
+		Symbol newSymbol;
+		std::vector<Symbol>  newSymbols;
+		ClearScreen();
+		cout<<"Enter number of random elements to insert: ";
+		cin>>numNewSymbols;
+
+		for (int i = 0; i < numNewSymbols; i++)
+		{
+			newSymbol.Name = GetRandomSymbolName();
+			newSymbol.Type = GetRandomSymbolType();
+			newSymbol.Scope = GetRandomSymbolScope();
+			newSymbols.push_back(newSymbol);
+		}
+
+		SimpleTimer stopwatch(true);
+		int numDuplicates = 0;
+		for (int j = 0; j < numNewSymbols; j++)
+		{
+			if (!BinaryInsert(symbolTable, newSymbols[j]))
+				numDuplicates++;
+		}
+		stopwatch.Pause();
+		if (numDuplicates == 0)
+			cout<<endl<<"Successfully added "<<numNewSymbols<<" elements.";
+		else
+			cout<<endl<<numDuplicates<<" randomly generated symbols already exist on the table. Only "<<numNewSymbols-numDuplicates<<" elements were added.";
+		_PrintElapsedTime(stopwatch);
+
+		char choice;
+		cout<<endl<<"Print symbol table? (y/n)";
+		cin>>choice;
+		if (choice == 'y')
+			PrintSymbolTable(symbolTable);
 }
 
 void SearchFromList_Many(std::vector<Symbol> & symbolTable)
