@@ -59,6 +59,8 @@ int main()
 	Hash::HashTable<Symbol> symbolHashT;
 
 	char * datasetFile = "symbol_table_1M.csv";
+
+start:
 	if (_PreloadDataset(datasetFile, symbolTableRaw))
 	{
 		std::list<Symbol> symbolTableCopy(symbolTableRaw);
@@ -81,6 +83,9 @@ int main()
 				<<"    [c] Delete X elements\n"
 				<<"    [v] Search X elements\n"
 				<<"    [b] Print table\n\n"
+				<<"  Dataset options\n"
+				<<"    [o] Reset dataset\n"
+				<<"    [p] Reload dataset\n\n"
 				<<"  Enter your choice ('q' to exit): ";
 			cin>>choice;
 
@@ -98,6 +103,15 @@ int main()
 				case 'c': DeleteFromHashTable_Many(symbolHashT); break;
 				case 'v': SearchFromHashTable_Many(symbolHashT); break;
 				case 'b': PrintHashTable(symbolHashT); break;
+
+				case 'o':
+					symbolTableSorted.clear();
+					symbolTableSorted.assign(symbolTableCopy.begin(), symbolTableCopy.end());
+					cout<<endl<<"  >> Dataset reset to "<<symbolTableSorted.size()<<" elements.";
+					getch();
+					break;
+				case 'p':
+					goto start;
 			}
 		} while(choice != 'q');
 	}
@@ -444,9 +458,10 @@ void AddSymbolToList_Many(std::vector<Symbol> & symbolTable)
 	else
 		cout<<endl<<numDuplicates<<" randomly generated symbols already exist on the table. Only "<<numNewSymbols-numDuplicates<<" elements were added.";
 	_PrintElapsedTime(stopwatch);
+	cout<<endl<<"Updated total number of elements: "<<symbolTable.size();
 
 	char choice;
-	cout<<endl<<"Print symbol table? (y/n) ";
+	cout<<endl<<endl<<"Print symbol table? (y/n) ";
 	cin>>choice;
 	if (choice == 'y')
 		PrintSymbolTable(symbolTable);
@@ -519,6 +534,7 @@ void DeleteFromList_Many(std::vector<Symbol> & symbolTable)
 		else
 			cout<<endl<<"Found duplicates on the delete list. Only deleted "<<numDeletes<<" elements. ";
 		_PrintElapsedTime(stopwatch);
+		cout<<endl<<"Updated total number of elements: "<<symbolTable.size();
 
 		char choice;
 		cout<<endl<<endl<<"Print symbol table? (y/n) ";
@@ -552,7 +568,7 @@ void DeleteFromHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
 // ----------------------- Misc. helper methods -----------------------
 void _PrintBanner()
 {
-	cout<<endl<<endl;
+	cout<<endl;
 	cout<<" ========================================="<<endl<<endl
         <<"  SYMBOL TABLE SIMULATOR (Benchmark mode) "<<endl<<endl
         <<" ========================================="<<endl<<endl;
@@ -566,7 +582,7 @@ void _PrintElapsedTime(SimpleTimer & stopwatch)
 bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 {
 	int tableSize;
-
+	ClearScreen();
 	cout<<"Enter desired table size: (1-"<<MAX_TABLE_SIZE<<") ";
 	cin>>tableSize;
 	if (tableSize < 1 or tableSize > MAX_TABLE_SIZE)
