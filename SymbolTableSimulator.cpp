@@ -32,6 +32,14 @@ void DeleteFromHashTable(Hash::HashTable<Symbol> &);
 void PrintSymbolTable(std::list<Symbol> &);
 void PrintSymbolTable(std::vector<Symbol> &);
 void PrintHashTable(Hash::HashTable<Symbol> &);
+
+void AddSymbolToList_Many(std::vector<Symbol> &);
+void AddSymbolToHashTable_Many(Hash::HashTable<Symbol> &);
+void SearchFromList_Many(std::vector<Symbol> &);
+void SearchFromHashTable_Many(Hash::HashTable<Symbol> &);
+void DeleteFromList_Many(std::vector<Symbol> &);
+void DeleteFromHashTable_Many(Hash::HashTable<Symbol> &);
+
 void _PrintBanner();
 bool _PreloadDataset(char *, std::list<Symbol> &);
 bool _SaveListToFile(char *, std::list<Symbol> &);
@@ -48,66 +56,47 @@ int main()
 	Hash::HashTable<Symbol> symbolHashT;
 
 	char * datasetFile = "symbol_table_1M.csv";
-	if (!_PreloadDataset(datasetFile, symbolTableRaw))
-	{
-		cout << "Unable to open file "<<datasetFile;
-		getch();
-	}
-	else
+	if (_PreloadDataset(datasetFile, symbolTableRaw))
 	{
 		std::list<Symbol> symbolTableCopy(symbolTableRaw);
 		symbolTableCopy.sort(CompareSymbols);
 		std::vector<Symbol> symbolTableSorted(symbolTableCopy.begin(), symbolTableCopy.end());
-
 
 		char choice;
 		do
 		{
 			ClearScreen();
 			_PrintBanner();
-			cout<<"  [1] Create hash table from dataset\n"
-				<<"  [2] Add new symbol to list\n"
-				<<"  [3] Add new symbol to hash table\n"
-				<<"  [4] Search symbol from sorted list using binary search\n"
-				<<"  [5] Search symbol from hash table\n"
-				<<"  [6] Delete symbol from list\n"
-				<<"  [7] Delete symbol from hash table\n"
-				<<"  [8] Print symbol table\n"
-				<<"  [9] Exit\n"
-				<<"  Enter your choice: ";
+			cout<<"  Binary search\n"
+				<<"    [a] Insert X random elements\n"
+				<<"    [s] Delete X elements\n"
+				<<"    [d] Search X elements\n"
+				<<"    [f] Print table\n\n"
+				<<"  Hash table\n"
+				<<"    [z] Initialize hash table\n"
+				<<"    [x] Insert X random elements\n"
+				<<"    [c] Delete X elements\n"
+				<<"    [v] Search X elements\n"
+				<<"    [b] Print table\n\n"
+				<<"  Enter your choice ('q' to exit): ";
 			cin>>choice;
 
 			switch(choice)
 			{
-			case '1': CreateHashTable(symbolHashT, symbolTableCopy); break;
-			case '2': AddSymbolToList(symbolTableSorted); break;
-			case '3': AddSymbolToHashTable(symbolHashT); break;
-			case '4': SearchFromList(symbolTableSorted); break;
-			case '5': SearchFromHashTable(symbolHashT); break;
-			case '6': DeleteFromList(symbolTableSorted); break;
-			case '7': DeleteFromHashTable(symbolHashT); break;
-			case '8':
-				char subChoice;
-				do
-				{
-					ClearScreen();
-					cout<<endl<<endl;
-					cout<<"  [a] Print raw symbol table\n"
-						<<"  [b] Print sorted symbol table\n"
-						<<"  [c] Print hash table \n"
-						<<"  [d] Back to main menu\n"
-						<<"  Enter your choice: ";
-					cin>>subChoice;
-					switch(subChoice)
-					{
-					case 'a': PrintSymbolTable(symbolTableRaw); break;
-					case 'b': PrintSymbolTable(symbolTableSorted); break;
-					case 'c': PrintHashTable(symbolHashT); break;
-					}
-				} while(subChoice != 'd');
-				break;
+				//Binary search options
+				case 'a': AddSymbolToList_Many(symbolTableSorted); break;
+				case 's': DeleteFromList_Many(symbolTableSorted); break;
+				case 'd': SearchFromList_Many(symbolTableSorted); break;
+				case 'f': PrintSymbolTable(symbolTableSorted); break;
+
+				//hash table options
+				case 'z': CreateHashTable(symbolHashT, symbolTableCopy); break;
+				case 'x': AddSymbolToHashTable_Many(symbolHashT); break;
+				case 'c': DeleteFromHashTable_Many(symbolHashT); break;
+				case 'v': SearchFromHashTable_Many(symbolHashT); break;
+				case 'b': PrintHashTable(symbolHashT); break;
 			}
-		} while(choice != '9');
+		} while(choice != 'q');
 	}
 	return 0;
 }
@@ -349,7 +338,7 @@ void PrintSymbolTable(std::vector<Symbol> & symbolTable)
 	ClearScreen();
 	unsigned int symbolCount = symbolTable.size();
 	bool savedToFile;
-	char * outputFileName = "list_sorted.csv";
+	char * outputFileName = "varlist_sorted.csv";
 	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
 	if (symbolCount > 0)
 	{
@@ -379,7 +368,7 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	ClearScreen();
 	unsigned int symbolCount = symbolHashTable.Size();
 	bool savedToFile;
-	char * outputFileName = "hashtable.csv";
+	char * outputFileName = "varhashtable.csv";
 
 	cout<<"Total number of symbols: "<<symbolCount<<endl<<endl;
 	if (symbolCount > 0)
@@ -413,13 +402,55 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 	getch();
 }
 
+void AddSymbolToList_Many(std::vector<Symbol> & symbolTable)
+{
+	ClearScreen();
+	cout<<"AddSymbolToList_Many() work in progress...";
+	getch();
+}
+
+void SearchFromList_Many(std::vector<Symbol> & symbolTable)
+{
+	ClearScreen();
+	cout<<"SearchFromList_Many() work in progress...";
+	getch();
+}
+
+void DeleteFromList_Many(std::vector<Symbol> & symbolTable)
+{
+	ClearScreen();
+	cout<<"DeleteFromList_Many() work in progress...";
+	getch();
+}
+
+void AddSymbolToHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
+{
+	ClearScreen();
+	cout<<"AddSymbolToHashTable_Many() work in progress...";
+	getch();
+}
+
+void SearchFromHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
+{
+	ClearScreen();
+	cout<<"SearchFromHashTable_Many() work in progress...";
+	getch();
+}
+
+void DeleteFromHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
+{
+	ClearScreen();
+	cout<<"DeleteFromHashTable_Many() work in progress...";
+	getch();
+}
+
 // ----------------------- Misc. helper methods -----------------------
 void _PrintBanner()
 {
 	cout<<endl<<endl;
-	cout<<" =========================="<<endl<<endl
-        <<"   SYMBOL TABLE SIMULATOR  "<<endl<<endl
-        <<" =========================="<<endl<<endl;
+	cout<<" ========================================="<<endl<<endl
+        <<"  SYMBOL TABLE SIMULATOR (Benchmark mode) "<<endl<<endl
+        <<" ========================================="<<endl<<endl;
 }
 
 void _PrintElapsedTime(SimpleTimer & stopwatch)
@@ -430,40 +461,46 @@ void _PrintElapsedTime(SimpleTimer & stopwatch)
 bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 {
 	int tableSize;
-	do
-	{
-		ClearScreen();
-		cout<<"Enter desired table size: (1-1000000) ";
-		cin>>tableSize;
-		if (tableSize < 1 or tableSize > 1000000)
-		{
-			cout<<endl<<"Invalid table size.";
-			getch();
-		}
-	}while(tableSize < 1 or tableSize > 1000000);
 
-	cout<<endl<<"Loading dataset...";
-	SimpleTimer stopwatch(true);
-	std::ifstream myfile (fileName);
-	if (myfile.good())
+	cout<<"Enter desired table size: (1-1000000) ";
+	cin>>tableSize;
+	if (tableSize < 1 or tableSize > 1000000)
 	{
-		string line;
-		std::getline(myfile, line); //ignore header
-		for (int i = 0; i < tableSize; i++)
-		{
-			std::getline(myfile, line);
-			table.push_back(_ExtractSymbol(line));
-		}
-//
-//		while(std::getline(myfile, line))
-//			table.push_back(_ExtractSymbol(line));
-		myfile.close();
-		cout<<endl<<"Success! Operation took "<<stopwatch.Elapsed_ms_str();
+		cout<<endl<<"Invalid table size. Exiting program...";
 		getch();
-		return true;
 	}
 	else
-		return false;
+	{
+		cout<<endl<<"Loading dataset...";
+		SimpleTimer stopwatch(true);
+		std::ifstream myfile (fileName);
+		if (myfile.good())
+		{
+			string line;
+			std::getline(myfile, line); //ignore header
+			for (int i = 0; i < tableSize; i++)
+			{
+				std::getline(myfile, line);
+				table.push_back(_ExtractSymbol(line));
+			}
+			myfile.close();
+			cout<<"success! Operation took "<<stopwatch.Elapsed_ms_str();
+
+			char * outputFileName = "varlist_raw.csv";
+			if (_SaveListToFile(outputFileName,table))
+				cout<<endl<<"\nSymbol table exported to "<<outputFileName;
+			else
+				cout<<"\nSymbol table not successfully exported to file.";
+			getch();
+			return true;
+		}
+		else
+		{
+			cout <<"Unable to open dataset file "<<fileName;
+			getch();
+			return false;
+		}
+	}
 }
 
 Symbol _ExtractSymbol(string line)
