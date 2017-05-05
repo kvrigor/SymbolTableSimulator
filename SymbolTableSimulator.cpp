@@ -21,6 +21,8 @@ using std::string;
 using namespace CustomTypes;
 using namespace SearchAlgorithms;
 
+const int MAX_TABLE_SIZE = 1000000;
+
 // -----------------------  prototypes -----------------------
 void CreateHashTable(Hash::HashTable<Symbol> &, const std::list<Symbol> &);
 void AddSymbolToList(std::vector<Symbol> &);
@@ -46,6 +48,7 @@ bool _SaveListToFile(char *, std::list<Symbol> &);
 bool _SaveListToFile(char *, std::vector<Symbol> &);
 void _PrintElapsedTime(SimpleTimer &);
 Symbol _ExtractSymbol(string);
+
 
 // -------------------------------------------------------------
 // ------------------------    MAIN    -------------------------
@@ -443,7 +446,7 @@ void AddSymbolToList_Many(std::vector<Symbol> & symbolTable)
 	_PrintElapsedTime(stopwatch);
 
 	char choice;
-	cout<<endl<<"Print symbol table? (y/n)";
+	cout<<endl<<"Print symbol table? (y/n) ";
 	cin>>choice;
 	if (choice == 'y')
 		PrintSymbolTable(symbolTable);
@@ -457,7 +460,7 @@ void SearchFromList_Many(std::vector<Symbol> & symbolTable)
 	ClearScreen();
 	cout<<"Enter number of random elements to search: (1-"<<symbolCount<<") ";
 	cin>>numSymbolsToSearch;
-	if (numSymbolsToSearch < 1 or numSymbolsToSearch > 1000000)
+	if (numSymbolsToSearch < 1 or numSymbolsToSearch > symbolCount)
 	{
 		cout<<endl<<"Invalid value.";
 	}
@@ -483,8 +486,47 @@ void SearchFromList_Many(std::vector<Symbol> & symbolTable)
 
 void DeleteFromList_Many(std::vector<Symbol> & symbolTable)
 {
+	int numSymbolsToDelete;
+	unsigned int symbolCount = symbolTable.size();
+	std::list<string>  symbolsToSearch;
 	ClearScreen();
-	cout<<"DeleteFromList_Many() work in progress...";
+	cout<<"Enter number of random elements to delete: (1-"<<symbolCount<<") ";
+	cin>>numSymbolsToDelete;
+	if (numSymbolsToDelete < 1 or numSymbolsToDelete > symbolCount)
+	{
+		cout<<endl<<"Invalid value.";
+	}
+	else
+	{
+		Symbol tempSymbol;
+		cout<<"Symbols to delete: "<<endl;
+		for (int i = 0; i < numSymbolsToDelete; i++)
+		{
+			tempSymbol = symbolTable[GetRandomNumber() % symbolCount];
+			symbolsToSearch.push_back(tempSymbol.Name);
+			cout<<"   "<<tempSymbol.Name<<endl;
+		}
+
+		int numDeletes = 0;
+		SimpleTimer stopwatch(true);
+		for (std::list<string>::iterator it=symbolsToSearch.begin(); it != symbolsToSearch.end(); ++it)
+		{
+			if (BinaryDelete(symbolTable, *it))
+				numDeletes++;
+		}
+		stopwatch.Pause();
+		if (numDeletes == numSymbolsToDelete)
+			cout<<endl<<"Successfully deleted "<<numSymbolsToDelete<<" elements.";
+		else
+			cout<<endl<<"Found duplicates on the delete list. Only deleted "<<numDeletes<<" elements. ";
+		_PrintElapsedTime(stopwatch);
+
+		char choice;
+		cout<<endl<<"Print symbol table? (y/n) ";
+		cin>>choice;
+		if (choice == 'y')
+			PrintSymbolTable(symbolTable);
+	}
 	getch();
 }
 
@@ -527,9 +569,9 @@ bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 {
 	int tableSize;
 
-	cout<<"Enter desired table size: (1-1000000) ";
+	cout<<"Enter desired table size: (1-"<<MAX_TABLE_SIZE<<") ";
 	cin>>tableSize;
-	if (tableSize < 1 or tableSize > 1000000)
+	if (tableSize < 1 or tableSize > MAX_TABLE_SIZE)
 	{
 		cout<<endl<<"Invalid table size. Exiting program...";
 		getch();
