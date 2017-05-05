@@ -141,4 +141,21 @@ bool IsKeyDown(int vKey)
 }
 
 
+std::string GetRandomSymbolName()
+{
+    static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    static const char numbers[] = "0123456789";
+
+    char s[9];
+    for (int i = 0; i < 5; ++i)
+        s[i] = alphabet[(GetTimeMs64()+rand()) % 52];
+    for (int j = 5; j < 8; ++j)
+        s[j] = numbers[(GetTimeMs64()+rand()) % 10];
+    s[8] = '\0';
+    std::string randStr(s);
+    return randStr;
+}
+
+
+
 #endif /* UTILS_H_ */
