@@ -466,8 +466,9 @@ void SearchFromList_Many(std::vector<Symbol> & symbolTable)
 	}
 	else
 	{
+		SetConsoleBufferHeight(15 + numSymbolsToSearch);
 		Symbol tempSymbol;
-		cout<<"Symbols to search: "<<endl;
+		cout<<endl<<"Symbols to search: "<<endl;
 		for (int i = 0; i < numSymbolsToSearch; i++)
 		{
 			tempSymbol = symbolTable[GetRandomNumber() % symbolCount];
@@ -488,30 +489,28 @@ void DeleteFromList_Many(std::vector<Symbol> & symbolTable)
 {
 	int numSymbolsToDelete;
 	unsigned int symbolCount = symbolTable.size();
-	std::list<string>  symbolsToSearch;
 	ClearScreen();
 	cout<<"Enter number of random elements to delete: (1-"<<symbolCount<<") ";
 	cin>>numSymbolsToDelete;
 	if (numSymbolsToDelete < 1 or numSymbolsToDelete > symbolCount)
 	{
 		cout<<endl<<"Invalid value.";
+		getch();
 	}
 	else
 	{
-		Symbol tempSymbol;
-		cout<<"Symbols to delete: "<<endl;
+		SetConsoleBufferHeight(15 + numSymbolsToDelete);
+		std::vector<Symbol>  symbolsTableCopy(symbolTable.begin(),symbolTable.end());
+		std::random_shuffle(symbolsTableCopy.begin(),symbolsTableCopy.end());
+		cout<<endl<<"Symbols to delete: "<<endl;
 		for (int i = 0; i < numSymbolsToDelete; i++)
-		{
-			tempSymbol = symbolTable[GetRandomNumber() % symbolCount];
-			symbolsToSearch.push_back(tempSymbol.Name);
-			cout<<"   "<<tempSymbol.Name<<endl;
-		}
+			cout<<"   "<<symbolsTableCopy[i].Name<<endl;
 
 		int numDeletes = 0;
 		SimpleTimer stopwatch(true);
-		for (std::list<string>::iterator it=symbolsToSearch.begin(); it != symbolsToSearch.end(); ++it)
+		for (int j = 0; j < numSymbolsToDelete; j++)
 		{
-			if (BinaryDelete(symbolTable, *it))
+			if (BinaryDelete(symbolTable, symbolsTableCopy[j].Name))
 				numDeletes++;
 		}
 		stopwatch.Pause();
@@ -522,12 +521,11 @@ void DeleteFromList_Many(std::vector<Symbol> & symbolTable)
 		_PrintElapsedTime(stopwatch);
 
 		char choice;
-		cout<<endl<<"Print symbol table? (y/n) ";
+		cout<<endl<<endl<<"Print symbol table? (y/n) ";
 		cin>>choice;
 		if (choice == 'y')
 			PrintSymbolTable(symbolTable);
 	}
-	getch();
 }
 
 void AddSymbolToHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
