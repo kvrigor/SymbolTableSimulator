@@ -156,6 +156,40 @@ std::string GetRandomSymbolName()
     return randStr;
 }
 
+std::string GetRandomSymbolType()
+{
+    int randomChoice = (GetTimeMs64()+rand()) % 8;
+    switch (randomChoice)
+    {
+		case 0: return "function-double";
+		case 1: return "class";
+		case 2: return "boolean";
+		case 3: return "function-integer";
+		case 4: return "integer";
+		case 5: return "function-boolean";
+		case 6: return "sub";
+		case 7: return "double";
+		default: return "";
+    }
+}
+
+std::string GetRandomSymbolScope()
+{
+    int randomChoice = (GetTimeMs64()+rand()) % 4;
+    switch (randomChoice)
+    {
+		case 0: return "private";
+		case 1: return "friend";
+		case 2: return "protected";
+		case 3: return "public";
+		default: return "";
+    }
+}
+
+
+
+
+
 
 
 #endif /* UTILS_H_ */
