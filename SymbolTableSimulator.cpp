@@ -414,45 +414,70 @@ void PrintHashTable(Hash::HashTable<Symbol> & symbolHashTable)
 void AddSymbolToList_Many(std::vector<Symbol> & symbolTable)
 {
 	int numNewSymbols;
-		Symbol newSymbol;
-		std::vector<Symbol>  newSymbols;
-		ClearScreen();
-		cout<<"Enter number of random elements to insert: ";
-		cin>>numNewSymbols;
+	Symbol newSymbol;
+	std::vector<Symbol>  newSymbols;
+	ClearScreen();
+	cout<<"Enter number of random elements to insert: ";
+	cin>>numNewSymbols;
 
-		for (int i = 0; i < numNewSymbols; i++)
-		{
-			newSymbol.Name = GetRandomSymbolName();
-			newSymbol.Type = GetRandomSymbolType();
-			newSymbol.Scope = GetRandomSymbolScope();
-			newSymbols.push_back(newSymbol);
-		}
+	for (int i = 0; i < numNewSymbols; i++)
+	{
+		newSymbol.Name = GetRandomSymbolName();
+		newSymbol.Type = GetRandomSymbolType();
+		newSymbol.Scope = GetRandomSymbolScope();
+		newSymbols.push_back(newSymbol);
+	}
 
-		SimpleTimer stopwatch(true);
-		int numDuplicates = 0;
-		for (int j = 0; j < numNewSymbols; j++)
-		{
-			if (!BinaryInsert(symbolTable, newSymbols[j]))
-				numDuplicates++;
-		}
-		stopwatch.Pause();
-		if (numDuplicates == 0)
-			cout<<endl<<"Successfully added "<<numNewSymbols<<" elements.";
-		else
-			cout<<endl<<numDuplicates<<" randomly generated symbols already exist on the table. Only "<<numNewSymbols-numDuplicates<<" elements were added.";
-		_PrintElapsedTime(stopwatch);
+	SimpleTimer stopwatch(true);
+	int numDuplicates = 0;
+	for (int j = 0; j < numNewSymbols; j++)
+	{
+		if (!BinaryInsert(symbolTable, newSymbols[j]))
+			numDuplicates++;
+	}
+	stopwatch.Pause();
+	if (numDuplicates == 0)
+		cout<<endl<<"Successfully added "<<numNewSymbols<<" elements.";
+	else
+		cout<<endl<<numDuplicates<<" randomly generated symbols already exist on the table. Only "<<numNewSymbols-numDuplicates<<" elements were added.";
+	_PrintElapsedTime(stopwatch);
 
-		char choice;
-		cout<<endl<<"Print symbol table? (y/n)";
-		cin>>choice;
-		if (choice == 'y')
-			PrintSymbolTable(symbolTable);
+	char choice;
+	cout<<endl<<"Print symbol table? (y/n)";
+	cin>>choice;
+	if (choice == 'y')
+		PrintSymbolTable(symbolTable);
 }
 
 void SearchFromList_Many(std::vector<Symbol> & symbolTable)
 {
+	int numSymbolsToSearch;
+	unsigned int symbolCount = symbolTable.size();
+	std::list<string>  symbolsToSearch;
 	ClearScreen();
-	cout<<"SearchFromList_Many() work in progress...";
+	cout<<"Enter number of random elements to search: (1-"<<symbolCount<<") ";
+	cin>>numSymbolsToSearch;
+	if (numSymbolsToSearch < 1 or numSymbolsToSearch > 1000000)
+	{
+		cout<<endl<<"Invalid value.";
+	}
+	else
+	{
+		Symbol tempSymbol;
+		cout<<"Symbols to search: "<<endl;
+		for (int i = 0; i < numSymbolsToSearch; i++)
+		{
+			tempSymbol = symbolTable[GetRandomNumber() % symbolCount];
+			symbolsToSearch.push_back(tempSymbol.Name);
+			cout<<"   "<<tempSymbol.Name<<endl;
+		}
+
+		SimpleTimer stopwatch(true);
+		for (std::list<string>::iterator it=symbolsToSearch.begin(); it != symbolsToSearch.end(); ++it)
+			BinarySearch(symbolTable, *it, tempSymbol);
+		cout<<endl<<"Successfully searched "<<numSymbolsToSearch<<" elements.";
+		_PrintElapsedTime(stopwatch);
+	}
 	getch();
 }
 
@@ -508,6 +533,7 @@ bool _PreloadDataset(char* fileName, std::list<Symbol> & table)
 	{
 		cout<<endl<<"Invalid table size. Exiting program...";
 		getch();
+		return false;
 	}
 	else
 	{
