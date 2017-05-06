@@ -123,19 +123,12 @@ void CreateHashTable(Hash::HashTable<Symbol> & symbolHashTable, const std::list<
 {
 	ClearScreen();
 	size_t tblsize, symCounts;
-	int hash2R;
 	do {
 		cout<<"Specify initial table size (1 to 1,000,000): ";
 		cin>>tblsize;
 	} while(tblsize < 1 || tblsize > 1000000);
 	symbolHashTable.Set(tblsize);
-	do {
-		cout<<"Specify hash2 function's R value (1 to "<<tblsize * 0.9<<", use 0 for auto): ";
-		cin>>hash2R;
-	} while(hash2R < 0 || hash2R > tblsize * 0.9);
-	if (hash2R == 0)
-		hash2R = tblsize / 10;
-	symbolHashTable.SetHash2_R(hash2R);
+	symbolHashTable.SetHash2_R(tblsize / 10);
 	do {
 		cout<<"Specify input array size (1 to 1,000,000): ";
 		cin>>symCounts;
