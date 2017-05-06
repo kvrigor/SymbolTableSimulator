@@ -16,7 +16,7 @@ namespace Hash
 	{
 		public:
 			HashTable(size_t size = 100);
-			
+			HashObj operator[](const int index);
 			void Set(size_t);
 			void MakeEmpty();
 			int Size();
@@ -64,6 +64,14 @@ namespace Hash
 		_symVector = new HashValue[_tblSize];
 		MakeEmpty();
 		hash2_R = nextPrime(_tblSize / 10);
+	}
+	
+	template <typename HashObj>
+	HashObj HashTable<HashObj>::operator[](const int index)
+	{
+		if (_symVector[index].info != 1)
+			_symVector[index].element.Name = "";
+		return _symVector[index].element;
 	}
 	
 	template <typename HashObj>
@@ -133,6 +141,7 @@ namespace Hash
 		if (retObj.info == 1)
 		{
 			retObj.info = -1;
+			active--;
 			return true;
 		}
 		else

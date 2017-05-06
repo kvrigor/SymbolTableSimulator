@@ -546,23 +546,125 @@ void DeleteFromList_Many(std::vector<Symbol> & symbolTable)
 
 void AddSymbolToHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
 {
+	int numNewSymbols;
+	Symbol newSymbol;
+	std::vector<Symbol>  newSymbols;
 	ClearScreen();
-	cout<<"AddSymbolToHashTable_Many() work in progress...";
-	getch();
+	cout<<"Enter number of random elements to insert: ";
+	cin>>numNewSymbols;
+
+	for (int i = 0; i < numNewSymbols; i++)
+	{
+		newSymbol.Name = GetRandomSymbolName();
+		newSymbol.Type = GetRandomSymbolType();
+		newSymbol.Scope = GetRandomSymbolScope();
+		newSymbols.push_back(newSymbol);
+	}
+
+	SimpleTimer stopwatch(true);
+	int numDuplicates = 0;
+	for (int j = 0; j < numNewSymbols; j++)
+	{
+		symbolHashTable.Insert(newSymbols[j]);
+	}
+	stopwatch.Pause();
+	/*if (numDuplicates == 0)
+		cout<<endl<<"Successfully added "<<numNewSymbols<<" elements.";
+	else
+		cout<<endl<<numDuplicates<<" randomly generated symbols already exist on the table. Only "<<numNewSymbols-numDuplicates<<" elements were added.";*/
+	_PrintElapsedTime(stopwatch);
+
+	char choice;
+	cout<<endl<<"Print symbol table? (y/n) ";
+	cin>>choice;
+	if (choice == 'y')
+		PrintHashTable(symbolHashTable);
 }
 
 void SearchFromHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
 {
+	int numSymbolsToSearch;
+	bool found;
+	unsigned int symbolCount = symbolHashTable.activeCount();
+	std::list<string>  symbolsToSearch;
 	ClearScreen();
-	cout<<"SearchFromHashTable_Many() work in progress...";
+	cout<<"Enter number of random elements to search: (1-"<<symbolCount<<") ";
+	cin>>numSymbolsToSearch;
+	if (numSymbolsToSearch < 1 or numSymbolsToSearch > symbolCount)
+	{
+		cout<<endl<<"Invalid value.";
+	}
+	else
+	{
+		SetConsoleBufferHeight(15 + numSymbolsToSearch);
+		Symbol tempSymbol;
+		cout<<endl<<"Symbols to search: "<<endl;
+		for (int i = 0; i < numSymbolsToSearch; i++)
+		{
+			do {
+				tempSymbol = symbolHashTable[GetRandomNumber() % symbolHashTable.Size()];
+			} while(tempSymbol.Name == "");
+			symbolsToSearch.push_back(tempSymbol.Name);
+			cout<<"   "<<tempSymbol.Name<<endl;
+		}
+
+		SimpleTimer stopwatch(true);
+		for (std::list<string>::iterator it=symbolsToSearch.begin(); it != symbolsToSearch.end(); ++it)
+			symbolHashTable.Retrieve(*it, found);
+		cout<<endl<<"Successfully searched "<<numSymbolsToSearch<<" elements.";
+		_PrintElapsedTime(stopwatch);
+	}
 	getch();
 }
 
 void DeleteFromHashTable_Many(Hash::HashTable<Symbol> & symbolHashTable)
 {
+	int numSymbolsToDelete;
+	unsigned int symbolCount = symbolHashTable.activeCount();
 	ClearScreen();
-	cout<<"DeleteFromHashTable_Many() work in progress...";
-	getch();
+	cout<<"Enter number of random elements to delete: (1-"<<symbolCount<<") ";
+	cin>>numSymbolsToDelete;
+	if (numSymbolsToDelete < 1 or numSymbolsToDelete > symbolCount)
+	{
+		cout<<endl<<"Invalid value.";
+		getch();
+	}
+	else
+	{
+		std::list<string>  symbolsToDelete;
+		Symbol tempSymbol;
+		SetConsoleBufferHeight(15 + numSymbolsToDelete);
+		cout<<endl<<"Symbols to delete: "<<endl;
+		for (int i = 0; i < numSymbolsToDelete; i++)
+		{
+			do {
+				tempSymbol = symbolHashTable[GetRandomNumber() % symbolHashTable.Size()];
+			} while(tempSymbol.Name == "");
+			symbolsToDelete.push_back(tempSymbol.Name);
+			cout<<"   "<<tempSymbol.Name<<endl;
+		}
+
+		int numDeletes = 0;
+		SimpleTimer stopwatch(true);
+		for (std::list<string>::iterator it=symbolsToDelete.begin(); it != symbolsToDelete.end(); ++it)
+		{
+			if (symbolHashTable.Delete(*it))
+				numDeletes++;
+		}
+		stopwatch.Pause();
+		if (numDeletes == numSymbolsToDelete)
+			cout<<endl<<"Successfully deleted "<<numSymbolsToDelete<<" elements.";
+		else
+			cout<<endl<<"Found duplicates on the delete list. Only deleted "<<numDeletes<<" elements. ";
+		_PrintElapsedTime(stopwatch);
+		cout<<endl<<"Updated total number of elements: "<<symbolHashTable.activeCount();
+
+		char choice;
+		cout<<endl<<endl<<"Print symbol table? (y/n) ";
+		cin>>choice;
+		if (choice == 'y')
+			PrintHashTable(symbolHashTable);
+	}
 }
 
 // ----------------------- Misc. helper methods -----------------------
