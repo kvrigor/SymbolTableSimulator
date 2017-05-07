@@ -1,9 +1,9 @@
 //============================================================================
 // Name        : SymbolTableSimulator.cpp
 // Authors     : chester.tan, paul.rigor
-// Version     : v0.2 [Beta]
+// Version     : v1.0b
 // Description : Simulates symbol table operations using hashing and binary search.
-// Git repo    : https://github.com/kvrigor/SymbolTableSimulator
+// Git repo    : https://github.com/kvrigor/SymbolTableSimulator/tree/data-collection
 //============================================================================
 
 #include <iostream>
