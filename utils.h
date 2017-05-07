@@ -140,6 +140,55 @@ bool IsKeyDown(int vKey)
 	return (GetAsyncKeyState(vKey) & 0x8000);
 }
 
+uint64 GetRandomNumber(uint64 seedValue = GetTimeMs64())
+{
+	return seedValue+rand();
+}
+
+std::string GetRandomSymbolName()
+{
+    static const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
+    static const char numbers[] = "0123456789";
+
+    char s[9];
+    for (int i = 0; i < 5; ++i)
+        s[i] = alphabet[GetRandomNumber() % 26];
+    for (int j = 5; j < 8; ++j)
+        s[j] = numbers[GetRandomNumber() % 10];
+    s[8] = '\0';
+    std::string randStr(s);
+    return randStr;
+}
+
+std::string GetRandomSymbolType()
+{
+    int randomChoice = GetRandomNumber() % 8;
+    switch (randomChoice)
+    {
+		case 0: return "function-double";
+		case 1: return "class";
+		case 2: return "boolean";
+		case 3: return "function-integer";
+		case 4: return "integer";
+		case 5: return "function-boolean";
+		case 6: return "sub";
+		case 7: return "double";
+		default: return "";
+    }
+}
+
+std::string GetRandomSymbolScope()
+{
+    int randomChoice = GetRandomNumber() % 4;
+    switch (randomChoice)
+    {
+		case 0: return "private";
+		case 1: return "friend";
+		case 2: return "protected";
+		case 3: return "public";
+		default: return "";
+    }
+}
 
 std::string GetRandomSymbolName()
 {
